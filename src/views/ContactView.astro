@@ -1,0 +1,127 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import ContactForm from "../components/ContactForm.astro";
+import { alt, routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { contact } from "../data/company";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const k = c.contact;
+---
+
+<BaseLayout locale={locale} alternates={alt("contact")} title={k.title} description={k.description} current="contact">
+  <PageHero
+    photo="saoPaulo"
+    locale={locale}
+    eyebrow={k.hero.eyebrow}
+    title={k.hero.title}
+    lead={k.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[{ label: "Integrade", href: routes.home[locale] }, { label: k.title }]}
+  />
+
+  <section class="section">
+    <div class="wrap contact">
+      <aside class="contact__channels">
+        <p class="eyebrow">{k.channels.title}</p>
+        <dl>
+          <div>
+            <dt>{k.channels.phone}</dt>
+            <dd><a href={contact.phoneHref}>{contact.phoneDisplay}</a></dd>
+          </div>
+          <div>
+            <dt>{k.channels.whatsapp}</dt>
+            <dd><a href={contact.whatsappHref} target="_blank" rel="noopener">{contact.phoneDisplay} ↗</a></dd>
+          </div>
+          <div>
+            <dt>{k.channels.email}</dt>
+            <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+          </div>
+          <div>
+            <dt>{k.channels.address}</dt>
+            <dd class="contact__address">
+              {contact.addressLines.map((l) => <span>{l}</span>)}
+              <a class="link-arrow" href={contact.mapsHref} target="_blank" rel="noopener">{k.channels.map}<span aria-hidden="true">↗</span></a>
+            </dd>
+          </div>
+        </dl>
+        <p class="small">{k.channels.hours}</p>
+        <p class="note" style="margin-top:28px">
+          {k.consultingNote}{" "}
+          <a href={contact.consultingUrl} target="_blank" rel="noopener" style="text-decoration:underline">integradeconsulting.com.br</a>
+        </p>
+      </aside>
+
+      <div class="contact__form">
+        <h2 class="h3" style="margin-bottom:28px">{k.formTitle}</h2>
+        <ContactForm locale={locale} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .contact__channels dl {
+    margin: 0 0 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .contact__channels dl > div {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .contact__channels dt {
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-600);
+    margin-bottom: 6px;
+  }
+
+  .contact__channels dd {
+    margin: 0;
+    font-size: clamp(18px, 1.5vw, 22px);
+    font-weight: 300;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .contact__address {
+    display: grid;
+    gap: 2px;
+    font-size: 17px !important;
+  }
+
+  .contact__address .link-arrow {
+    margin-top: 12px;
+    justify-self: start;
+    font-size: 14px;
+  }
+
+  .contact__form {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: clamp(24px, 3.4vw, 48px);
+  }
+
+  @media (max-width: 900px) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,217 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import ProofBand from "../components/ProofBand.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const s = c.services;
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<BaseLayout locale={locale} alternates={alt("services")} title={s.title} description={s.description} current="services">
+  <PageHero
+    photo="engineer"
+    locale={locale}
+    eyebrow={s.hero.eyebrow}
+    title={s.hero.title}
+    lead={s.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[{ label: "Integrade", href: routes.home[locale] }, { label: "Services" }]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href={`${routes.contact[locale]}?need=inventario`}>{s.hero.primary}<span aria-hidden="true">→</span></a>
+      <a class="link-arrow" href={routes.outsourcing[locale]}>{s.hero.secondary}<span aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={s.oneoff.eyebrow} title={s.oneoff.title} lead={s.oneoff.lead} />
+      <ol class="svc">
+        {s.oneoff.items.map((it, i) => (
+          <li class="svc__item">
+            <span class="svc__no">{pad(i + 1)}</span>
+            <h3 class="h3">{it.title}</h3>
+            <p>{it.text}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="note mt-l">{s.boundary}</p>
+    </div>
+  </section>
+
+  <section class="section section--darker">
+    <div class="wrap recurring">
+      <div>
+        <p class="eyebrow">{s.recurring.eyebrow}</p>
+        <h2 class="h2">{s.recurring.title}</h2>
+      </div>
+      <div>
+        <p class="lead">{s.recurring.text}</p>
+        <div class="actions">
+          <a class="btn btn--gold" href={routes.outsourcing[locale]}>{s.recurring.cta}<span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={s.compare.eyebrow} title={s.compare.title} stacked />
+      <div class="table-wrap">
+        <table class="cmp">
+          <thead>
+            <tr>
+              {s.compare.headers.map((hd, i) => (i === 0 ? <td></td> : <th scope="col">{hd}</th>))}
+            </tr>
+          </thead>
+          <tbody>
+            {s.compare.rows.map((row) => (
+              <tr>
+                <th scope="row">{row[0]}</th>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--pale">
+    <div class="wrap public">
+      <div>
+        <p class="eyebrow">{s.publicSector.title}</p>
+        <p class="public__text">{s.publicSector.text}</p>
+      </div>
+      <ProofBand locale={locale} />
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="inventario" />
+</BaseLayout>
+
+<style>
+  .svc {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  .svc__item {
+    padding: 32px 30px 36px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .svc__no {
+    display: block;
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--teal-600);
+    margin-bottom: 40px;
+  }
+
+  .svc__item h3 {
+    margin-bottom: 12px;
+  }
+
+  .svc__item p {
+    color: var(--muted);
+    margin: 0;
+  }
+
+  @media (max-width: 960px) {
+    .svc {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .svc {
+      grid-template-columns: 1fr;
+    }
+    .svc__no {
+      margin-bottom: 16px;
+    }
+  }
+
+  .recurring {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: end;
+  }
+
+  @media (max-width: 860px) {
+    .recurring {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .cmp {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+  }
+
+  .cmp th,
+  .cmp td {
+    text-align: left;
+    vertical-align: top;
+    padding: 22px 20px 22px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 15.5px;
+  }
+
+  .cmp thead th {
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    border-bottom: 2px solid var(--navy);
+  }
+
+  .cmp tbody th {
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-600);
+    width: 18%;
+  }
+
+  .cmp td {
+    color: var(--text);
+  }
+
+  .public {
+    display: grid;
+    gap: 40px;
+  }
+
+  .public__text {
+    font-size: clamp(20px, 1.8vw, 26px);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    max-width: 52ch;
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,320 @@
+---
+import { modulePath, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+  id?: string;
+  dark?: boolean;
+}
+
+const { locale, id = "lc", dark = false } = Astro.props;
+const c = getCopy(locale);
+const L = c.lifecycle.labels;
+const stages = c.lifecycle.stages;
+const moduleName = (slug: string) => c.modules.items.find((m) => m.slug === slug)?.name ?? slug;
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<div class:list={["lc", { "lc--dark": dark }]} data-tabs>
+  <div class="lc__rail" role="tablist" aria-label={c.home.lifecycle.eyebrow}>
+    {stages.map((s, i) => (
+      <button
+        class="lc__step"
+        type="button"
+        role="tab"
+        id={`${id}-tab-${i}`}
+        aria-controls={`${id}-panel-${i}`}
+        aria-selected={i === 0 ? "true" : "false"}
+        tabindex={i === 0 ? 0 : -1}
+      >
+        <span class="lc__dot" aria-hidden="true"></span>
+        <span class="lc__no">{pad(i + 1)}</span>
+        <span class="lc__short">{s.short}</span>
+      </button>
+    ))}
+  </div>
+
+  {stages.map((s, i) => (
+    <div class="lc__panel" role="tabpanel" id={`${id}-panel-${i}`} aria-labelledby={`${id}-tab-${i}`} tabindex="0" hidden={i !== 0}>
+      <div class="lc__intro">
+        <p class="lc__count">{pad(i + 1)} / {pad(stages.length)}</p>
+        <h3 class="lc__title">{s.title}</h3>
+        <p class="lc__summary">{s.summary}</p>
+      </div>
+      <div class="lc__roles">
+        {s.consulting && (
+          <div class="lc__role">
+            <p class="lc__role-name">Integrade {L.consulting}</p>
+            <p>{s.consulting}</p>
+          </div>
+        )}
+        {s.services && (
+          <div class="lc__role">
+            <p class="lc__role-name">Integrade {L.services}</p>
+            <p>{s.services}</p>
+          </div>
+        )}
+        {s.solutions && (
+          <div class="lc__role">
+            <p class="lc__role-name">Integrade {L.solutions}</p>
+            <p>{s.solutions}</p>
+          </div>
+        )}
+        <div class="lc__role lc__role--modules">
+          <p class="lc__role-name">{L.modules}</p>
+          <ul class="lc__mods">
+            {s.modules.map((slug) => (
+              <li><a href={modulePath(locale, slug)}>{moduleName(slug)}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  ))}
+
+  <div class="lc__foot">
+    <p class="lc__transversal"><strong>{L.transversal} · One Connect</strong> — {L.transversalText}</p>
+    <p class="lc__note">{L.note}</p>
+  </div>
+</div>
+
+<style>
+  .lc {
+    --lc-line: var(--line);
+    --lc-ink: var(--ink);
+    --lc-muted: var(--muted);
+    --lc-surface: var(--white);
+  }
+
+  .lc--dark {
+    --lc-line: var(--line-dark);
+    --lc-ink: var(--white);
+    --lc-muted: #b9cddb;
+    --lc-surface: var(--navy-700);
+  }
+
+  .lc__rail {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    margin-bottom: 40px;
+  }
+
+  .lc__rail::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 9px;
+    height: 1px;
+    background: var(--lc-line);
+  }
+
+  .lc__step {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: 6px;
+    padding: 0 12px 0 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--lc-muted);
+  }
+
+  .lc__dot {
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    border: 1px solid var(--lc-line);
+    background: var(--lc-surface);
+    margin-bottom: 14px;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .lc__no {
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lc__short {
+    font-size: clamp(14px, 1.2vw, 17px);
+    font-weight: 550;
+    color: var(--lc-ink);
+  }
+
+  .lc__step:hover .lc__dot {
+    border-color: var(--teal);
+  }
+
+  .lc__step[aria-selected="true"] .lc__dot {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 6px rgba(255, 170, 0, 0.18);
+  }
+
+  .lc__step[aria-selected="true"] .lc__no {
+    color: var(--teal);
+  }
+
+  .lc--dark .lc__step[aria-selected="true"] .lc__no {
+    color: var(--gold);
+  }
+
+  .lc__panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: clamp(28px, 5vw, 80px);
+    padding: clamp(28px, 3.5vw, 48px);
+    border: 1px solid var(--lc-line);
+    background: var(--lc-surface);
+    min-height: 300px;
+  }
+
+  .lc--dark .lc__panel {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .lc__count {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--lc-muted);
+    margin-bottom: 18px;
+  }
+
+  .lc__title {
+    font-size: clamp(28px, 3vw, 42px);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: var(--lc-ink);
+    margin-bottom: 18px;
+  }
+
+  .lc__summary {
+    color: var(--lc-muted);
+    font-size: 16.5px;
+    margin: 0;
+  }
+
+  .lc__roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 32px;
+    align-content: start;
+  }
+
+  .lc__role {
+    padding: 18px 0;
+    border-top: 1px solid var(--lc-line);
+  }
+
+  .lc__role p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--lc-muted);
+  }
+
+  .lc__role p.lc__role-name {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-600);
+    margin-bottom: 8px;
+  }
+
+  .lc--dark .lc__role p.lc__role-name {
+    color: var(--gold);
+  }
+
+  .lc__mods {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .lc__mods a {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: background 0.15s ease;
+  }
+
+  .lc--dark .lc__mods a {
+    background: var(--white);
+    color: var(--navy);
+  }
+
+  .lc__mods a:hover {
+    background: var(--teal-600);
+    color: var(--white);
+  }
+
+  .lc__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 40px;
+    margin-top: 24px;
+  }
+
+  .lc__transversal {
+    font-size: 14.5px;
+    color: var(--lc-muted);
+    margin: 0;
+    max-width: 80ch;
+  }
+
+  .lc__transversal strong {
+    color: var(--lc-ink);
+    font-weight: 600;
+  }
+
+  .lc__note {
+    font-size: 12.5px;
+    color: var(--lc-muted);
+    margin: 0;
+  }
+
+  @media (max-width: 900px) {
+    .lc__panel {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .lc__rail {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 112px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 6px;
+      margin-left: calc(var(--gutter) * -1);
+      margin-right: calc(var(--gutter) * -1);
+      padding-left: var(--gutter);
+    }
+    .lc__rail::before {
+      left: var(--gutter);
+      width: calc(112px * 7);
+      right: auto;
+    }
+    .lc__roles {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { initTabs } from "../scripts/tabs";
+  initTabs();
+</script>

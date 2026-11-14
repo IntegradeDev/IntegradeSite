@@ -1,0 +1,108 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import ContactForm from "../components/ContactForm.astro";
+import { locales, routes, modePath, type Locale, type ModeId, type Alternates } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+  id: ModeId;
+}
+
+const { locale, id } = Astro.props;
+const c = getCopy(locale);
+const L = c.modes.labels;
+const mode = c.modes.items.find((m) => m.id === id)!;
+const other = c.modes.items.find((m) => m.id !== id)!;
+const alternates = Object.fromEntries(locales.map((l) => [l, modePath(l, id)])) as Alternates;
+const equipLabel = c.ui.mega.solutions.groups[2].title;
+const isRental = id === "rental";
+---
+
+<BaseLayout locale={locale} alternates={alternates} title={mode.name} description={`${mode.name}: ${mode.summary} ${mode.lead}`} current="solutions">
+  <PageHero
+    photo={isRental ? "warehouse" : "fieldScan"}
+    locale={locale}
+    eyebrow={`Integrade Solutions · ${equipLabel}`}
+    title={mode.name}
+    lead={mode.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[
+      { label: "Integrade", href: routes.home[locale] },
+      { label: "Solutions", href: routes.solutions[locale] },
+      { label: equipLabel, href: routes.equipment[locale] },
+      { label: mode.short },
+    ]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href="#proposta">{L.form}<span aria-hidden="true">↓</span></a>
+      <a class="link-arrow" href={modePath(locale, other.id as ModeId)}>{other.name}<span aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section section--pale" id="proposta">
+    <div class="wrap mode-grid">
+      <div>
+        <p class="eyebrow">{mode.short}</p>
+        <h2 class="h2">{mode.summary}</h2>
+        <ul class="ticks" style="margin-top:32px">{mode.points.map((p) => <li>{p}</li>)}</ul>
+        <p class="note" style="margin-top:32px">{L.guarantee}</p>
+      </div>
+      <div class="mode-form">
+        <ContactForm
+          locale={locale}
+          needs={[
+            { value: "equipamentos", label: mode.name },
+            { value: "orientacao", label: c.ui.form.guidance },
+          ]}
+          preset="equipamentos"
+          origin={mode.name}
+          detailsOpen
+        >
+          <div class="form__row">
+            <div class="field"><label for={`m-use-${id}`}>{L.intendedUse}</label><input id={`m-use-${id}`} name={L.intendedUse} placeholder={L.intendedUsePh} /></div>
+            <div class="field"><label for={`m-tech-${id}`}>{L.technology}</label><input id={`m-tech-${id}`} name={L.technology} placeholder={L.technologyPh} /></div>
+          </div>
+          <div class="form__row" style="margin-top:16px">
+            <div class="field"><label for={`m-qty-${id}`}>{L.quantity}</label><input id={`m-qty-${id}`} name={L.quantity} /></div>
+            <div class="field"><label for={`m-loc-${id}`}>{L.location}</label><input id={`m-loc-${id}`} name={L.location} /></div>
+          </div>
+          {isRental ? (
+            <div class="form__row" style="margin-top:16px">
+              <div class="field"><label for={`m-dates-${id}`}>{L.dates}</label><input id={`m-dates-${id}`} name={L.dates} placeholder={L.datesPh} /></div>
+              <div class="field"><label for={`m-support-${id}`}>{L.support}</label><input id={`m-support-${id}`} name={L.support} /></div>
+            </div>
+          ) : (
+            <div class="field" style="margin-top:16px"><label for={`m-deadline-${id}`}>{L.deadline}</label><input id={`m-deadline-${id}`} name={L.deadline} /></div>
+          )}
+        </ContactForm>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .mode-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .mode-grid .h2 {
+    font-size: clamp(26px, 2.8vw, 40px);
+  }
+
+  .mode-form {
+    background: var(--white);
+    border: 1px solid var(--line);
+    padding: clamp(24px, 3vw, 40px);
+  }
+
+  @media (max-width: 900px) {
+    .mode-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

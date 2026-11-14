@@ -1,0 +1,151 @@
+---
+import type { Locale } from "../i18n/locales";
+import { brands } from "../data/clients";
+
+interface Props {
+  locale: Locale;
+  compact?: boolean;
+}
+
+const { locale, compact = false } = Astro.props;
+const list = compact ? brands.filter((b) => b.logo) : brands;
+---
+
+<ul class:list={["logos", { "logos--compact": compact }]}>
+  {list.map((b) => (
+    <li class="logos__cell" title={b.name}>
+      <span class="logos__bar" aria-hidden="true"></span>
+      {b.logo ? (
+        <span class="logos__img">
+          <img src={b.logo} alt={b.name} loading="lazy" decoding="async" />
+        </span>
+      ) : (
+        <span class="logos__word">{b.label ?? b.name}</span>
+      )}
+      {!compact && <span class="logos__area">{b.area[locale]}</span>}
+    </li>
+  ))}
+</ul>
+
+<style>
+  .logos {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .logos__cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 136px;
+    padding: 24px 18px;
+    background: var(--white);
+    text-align: center;
+    transition: background 0.3s ease;
+  }
+
+  .logos__cell:hover {
+    background: var(--paper);
+  }
+
+  .logos__bar {
+    position: absolute;
+    top: 0;
+    left: 24px;
+    right: 24px;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .logos__cell:hover .logos__bar {
+    transform: scaleX(1);
+  }
+
+  .logos__img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    width: 100%;
+  }
+
+  .logos__img img {
+    max-height: 100%;
+    max-width: 150px;
+    width: auto;
+    object-fit: contain;
+    filter: grayscale(1);
+    opacity: 0.72;
+    mix-blend-mode: multiply;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+  }
+
+  .logos__cell:hover .logos__img img {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+
+  .logos__word {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #4b5d6f;
+    transition: color 0.3s ease;
+  }
+
+  .logos__cell:hover .logos__word {
+    color: var(--navy);
+  }
+
+  .logos__area {
+    font-size: 10.5px;
+    font-weight: 650;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8a9bab;
+  }
+
+  .logos--compact {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .logos--compact .logos__cell {
+    min-height: 112px;
+  }
+
+  @media (max-width: 1024px) {
+    .logos,
+    .logos--compact {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .logos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .logos--compact {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .logos__cell {
+      min-height: 104px;
+      padding: 18px 10px;
+    }
+    .logos__img img {
+      max-width: 100%;
+    }
+  }
+</style>

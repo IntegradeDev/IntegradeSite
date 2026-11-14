@@ -1,0 +1,152 @@
+---
+interface Props {
+  labels: string[];
+  center: string;
+  ariaLabel: string;
+}
+
+const { labels, center, ariaLabel } = Astro.props;
+const cx = 300;
+const cy = 300;
+const r = 196;
+const lr = 244;
+const nodes = labels.map((label, i) => {
+  const a = (-90 + (i * 360) / labels.length) * (Math.PI / 180);
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  return {
+    label,
+    x: cx + r * cos,
+    y: cy + r * sin,
+    lx: cx + lr * cos,
+    ly: cy + lr * sin + 5,
+    anchor: cos > 0.25 ? "start" : cos < -0.25 ? "end" : "middle",
+    no: String(i + 1).padStart(2, "0"),
+  };
+});
+---
+
+<figure class="orbit" role="img" aria-label={ariaLabel}>
+  <svg viewBox="-40 0 680 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <radialGradient id="orbit-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#048ba8" stop-opacity="0.28" />
+        <stop offset="100%" stop-color="#048ba8" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+    <circle cx={cx} cy={cy} r="250" fill="url(#orbit-glow)" />
+    <circle cx={cx} cy={cy} r="276" fill="none" stroke="rgba(255,255,255,0.07)" />
+    <circle class="orbit__dash" cx={cx} cy={cy} r="140" fill="none" stroke="rgba(108,198,216,0.35)" stroke-dasharray="2 9" />
+    <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.22)" />
+    <circle class="orbit__progress" cx={cx} cy={cy} r={r} fill="none" stroke="#ffaa00" stroke-width="2" stroke-linecap="round" stroke-dasharray="180 1052" transform={`rotate(-90 ${cx} ${cy})`} />
+
+    {nodes.map((n, i) => (
+      <g class="orbit__node" style={`--i:${i}`}>
+        <circle cx={n.x} cy={n.y} r="15" fill="#102d4e" stroke={i === 0 ? "#ffaa00" : "rgba(255,255,255,0.45)"} />
+        <circle cx={n.x} cy={n.y} r="4" fill={i === 0 ? "#ffaa00" : "#6cc6d8"} />
+        <text x={n.lx} y={n.ly - 14} text-anchor={n.anchor} class="orbit__no">{n.no}</text>
+        <text x={n.lx} y={n.ly + 6} text-anchor={n.anchor} class="orbit__label">{n.label}</text>
+      </g>
+    ))}
+
+    <g transform={`translate(${cx - 108} ${cy - 84})`}>
+      <rect width="216" height="168" rx="14" fill="#1b3f63" stroke="rgba(255,255,255,0.18)" />
+      <g transform="translate(84 26)">
+        <polygon points="24,0 48,12 24,24 0,12" fill="#ffaa00" />
+        <path d="M0 30 L24 42 L48 30" stroke="#048ba8" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M0 45 L24 57 L48 45" stroke="#048ba8" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="108" y="118" text-anchor="middle" class="orbit__center">{center}</text>
+      <text x="108" y="142" text-anchor="middle" class="orbit__sub">CONSULTING · SERVICES · SOLUTIONS</text>
+    </g>
+  </svg>
+</figure>
+
+<style>
+  .orbit {
+    margin: 0;
+    width: 100%;
+    max-width: 600px;
+    justify-self: end;
+  }
+
+  .orbit svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .orbit__label {
+    fill: #e4edf4;
+    font-family: var(--font-sans);
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .orbit__no {
+    fill: #7f9fb7;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+  }
+
+  .orbit__center {
+    fill: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  .orbit__sub {
+    fill: #9fbad0;
+    font-family: var(--font-sans);
+    font-size: 8.5px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+  }
+
+  .orbit__dash {
+    transform-origin: 300px 300px;
+    animation: orbit-spin 60s linear infinite;
+  }
+
+  .orbit__progress {
+    animation: orbit-progress 14s ease-in-out infinite;
+  }
+
+  .orbit__node {
+    opacity: 0;
+    animation: orbit-in 0.6s ease forwards;
+    animation-delay: calc(var(--i) * 90ms + 200ms);
+  }
+
+  @keyframes orbit-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes orbit-progress {
+    0% {
+      stroke-dasharray: 0 1232;
+    }
+    60%,
+    100% {
+      stroke-dasharray: 1232 0;
+    }
+  }
+
+  @keyframes orbit-in {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orbit__node {
+      opacity: 1;
+    }
+  }
+</style>

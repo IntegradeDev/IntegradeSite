@@ -1,0 +1,30 @@
+---
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  titleHtml?: string;
+  lead?: string;
+  stacked?: boolean;
+}
+
+const { eyebrow, title, titleHtml, lead, stacked = false } = Astro.props;
+---
+
+<div class:list={[stacked ? "head--stacked" : "split"]}>
+  <div>
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    {titleHtml ? <h2 class="h2" set:html={titleHtml} /> : <h2 class="h2">{title}</h2>}
+  </div>
+  {lead && <p class="lead">{lead}</p>}
+  <slot />
+</div>
+
+<style>
+  .head--stacked {
+    max-width: 880px;
+    margin-bottom: clamp(40px, 5vw, 64px);
+  }
+  .head--stacked .lead {
+    margin-top: 24px;
+  }
+</style>

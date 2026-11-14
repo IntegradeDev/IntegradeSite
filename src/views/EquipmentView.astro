@@ -1,0 +1,130 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, modePath, type Locale, type ModeId } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const e = c.equipment;
+const modes = c.modes.items;
+const equipLabel = c.ui.mega.solutions.groups[2].title;
+---
+
+<BaseLayout locale={locale} alternates={alt("equipment")} title={e.title} description={e.description} current="solutions">
+  <PageHero
+    photo="fieldScan"
+    locale={locale}
+    eyebrow={e.hero.eyebrow}
+    title={e.hero.title}
+    lead={e.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[
+      { label: "Integrade", href: routes.home[locale] },
+      { label: "Solutions", href: routes.solutions[locale] },
+      { label: equipLabel },
+    ]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href={modePath(locale, "purchase")}>{e.hero.primary}<span aria-hidden="true">→</span></a>
+      <a class="btn btn--outline-light" href={modePath(locale, "rental")}>{e.hero.secondary}<span aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={e.categories.eyebrow} title={e.categories.title} stacked />
+      <div class="grid grid--4">
+        {e.categories.items.map((it, n) => (
+          <article class="cat">
+            <span class="cat__no">{String(n + 1).padStart(2, "0")}</span>
+            <h3 class="h3">{it.title}</h3>
+            <p>{it.text}</p>
+          </article>
+        ))}
+      </div>
+      <p class="note mt-l">{e.categories.note}</p>
+    </div>
+  </section>
+
+  <section class="section section--pale">
+    <div class="wrap">
+      <SectionHead eyebrow={e.modes.eyebrow} title={e.modes.title} stacked />
+      <div class="grid grid--2">
+        {modes.map((m, n) => (
+          <a class:list={["card", "mode", { "card--dark": n === 0 }]} href={modePath(locale, m.id as ModeId)}>
+            <p class="card__kicker">{String(n + 1).padStart(2, "0")} · {m.short}</p>
+            <h3 class="mode__title">{m.name}</h3>
+            <p>{m.summary}</p>
+            <ul class="ticks">{m.points.map((p) => <li>{p}</li>)}</ul>
+            <span class="link-arrow">{c.modes.labels.form}<span aria-hidden="true">→</span></span>
+          </a>
+        ))}
+      </div>
+      <div class="bundle mt-l">
+        <h3 class="h3">{e.bundle.title}</h3>
+        <p>{e.bundle.text}</p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="equipamentos" />
+</BaseLayout>
+
+<style>
+  .cat {
+    border-top: 2px solid var(--navy);
+    padding-top: 22px;
+  }
+
+  .cat__no {
+    display: block;
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--teal-600);
+    margin-bottom: 32px;
+  }
+
+  .cat h3 {
+    margin-bottom: 10px;
+  }
+
+  .cat p {
+    color: var(--muted);
+  }
+
+  .mode__title {
+    font-size: clamp(28px, 2.6vw, 38px) !important;
+    font-weight: 300 !important;
+    letter-spacing: -0.03em;
+  }
+
+  .mode .link-arrow {
+    margin-top: auto;
+  }
+
+  .card--dark .link-arrow {
+    color: var(--white);
+  }
+
+  .bundle {
+    border-left: 3px solid var(--gold);
+    padding-left: 24px;
+    max-width: 80ch;
+  }
+
+  .bundle h3 {
+    margin-bottom: 8px;
+  }
+
+  .bundle p {
+    margin: 0;
+    color: var(--muted);
+  }
+</style>

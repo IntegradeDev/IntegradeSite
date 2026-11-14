@@ -1,0 +1,223 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { locales, routes, modulePath, type Locale, type Alternates } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+const c = getCopy(locale);
+const L = c.modules.labels;
+const items = c.modules.items;
+const index = items.findIndex((m) => m.slug === slug);
+const mod = items[index];
+const stages = c.lifecycle.stages.filter((s) => s.modules.includes(slug));
+const alternates = Object.fromEntries(locales.map((l) => [l, modulePath(l, slug)])) as Alternates;
+const others = items.filter((m) => m.slug !== slug);
+const contactHref = `${routes.contact[locale]}?need=software&origin=${encodeURIComponent(mod.name)}`;
+---
+
+<BaseLayout locale={locale} alternates={alternates} title={`${mod.name} — ${mod.descriptor} | Integrade One`} description={`${mod.name}: ${mod.need} ${mod.benefit}`} current="one">
+  <PageHero
+    eyebrow={`Integrade One · ${L.module} ${String(index + 1).padStart(2, "0")} · ${mod.descriptor}`}
+    title={mod.name}
+    lead={mod.headline}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[
+      { label: "Integrade", href: routes.home[locale] },
+      { label: "Solutions", href: routes.solutions[locale] },
+      { label: "Integrade One", href: routes.integradeOne[locale] },
+      { label: mod.name },
+    ]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href={contactHref}>{L.talk}<span aria-hidden="true">→</span></a>
+      <a class="link-arrow" href={`${routes.integradeOne[locale]}#modulos`}>{L.all}<span aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap facts">
+      <dl class="rule-list facts__list">
+        <div class="fact">
+          <dt>{L.need}</dt>
+          <dd>{mod.need}</dd>
+        </div>
+        <div class="fact">
+          <dt>{L.benefit}</dt>
+          <dd>{mod.benefit}</dd>
+        </div>
+        <div class="fact">
+          <dt>{L.relation}</dt>
+          <dd>{mod.relation}</dd>
+        </div>
+        {mod.origin && (
+          <div class="fact">
+            <dt>{L.origin}</dt>
+            <dd>{mod.origin}</dd>
+          </div>
+        )}
+      </dl>
+
+      {stages.length > 0 && (
+        <aside class="facts__stages">
+          <p class="card__kicker">{L.stages}</p>
+          <ul>
+            {stages.map((s) => (
+              <li>
+                <strong>{s.title}</strong>
+                <span>{s.summary}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+    </div>
+    <div class="wrap">
+      <p class="note mt-l">{L.scope}</p>
+    </div>
+  </section>
+
+  <section class="section section--pale section--tight">
+    <div class="wrap">
+      <p class="eyebrow">{L.all}</p>
+      <ul class="others">
+        {others.map((m) => (
+          <li>
+            <a href={modulePath(locale, m.slug)}>
+              <strong>{m.name}</strong>
+              <small>{m.descriptor}</small>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="software" />
+</BaseLayout>
+
+<style>
+  .facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .facts__list {
+    margin: 0;
+  }
+
+  .fact {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fact dt {
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-600);
+    padding-top: 4px;
+  }
+
+  .fact dd {
+    margin: 0;
+    font-size: clamp(17px, 1.4vw, 20px);
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .facts__stages {
+    background: var(--navy);
+    color: #cfdde8;
+    padding: 32px;
+  }
+
+  .facts__stages .card__kicker {
+    color: var(--gold);
+  }
+
+  .facts__stages ul {
+    list-style: none;
+    display: grid;
+    gap: 18px;
+  }
+
+  .facts__stages li {
+    display: grid;
+    gap: 4px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .facts__stages strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .facts__stages span {
+    font-size: 14.5px;
+    color: #b9cddb;
+  }
+
+  @media (max-width: 900px) {
+    .facts {
+      grid-template-columns: 1fr;
+    }
+    .fact {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+
+  .others {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .others a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    transition: border-color 0.2s ease;
+  }
+
+  .others a:hover {
+    border-color: var(--navy);
+  }
+
+  .others strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .others small {
+    color: var(--muted);
+    font-size: 13px;
+    text-align: right;
+  }
+
+  @media (max-width: 860px) {
+    .others {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

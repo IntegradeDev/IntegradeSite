@@ -1,0 +1,28 @@
+---
+import type { Locale } from "../i18n/locales";
+import { photos, type PhotoId } from "../data/photos";
+
+interface Props {
+  id: PhotoId;
+  locale: Locale;
+  class?: string;
+  eager?: boolean;
+  sizes?: string;
+}
+
+const { id, locale, class: className, eager = false, sizes = "(max-width: 900px) 100vw, 50vw" } = Astro.props;
+const p = photos[id];
+---
+
+<img
+  class={className}
+  src={`/img/fotos/${p.file}-1600.webp`}
+  srcset={`/img/fotos/${p.file}-800.webp 800w, /img/fotos/${p.file}-1600.webp 1600w`}
+  sizes={sizes}
+  alt={p.alt[locale]}
+  width="1600"
+  height={Math.round((1600 * p.h) / p.w)}
+  loading={eager ? "eager" : "lazy"}
+  decoding="async"
+  fetchpriority={eager ? "high" : undefined}
+/>

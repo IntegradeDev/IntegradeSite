@@ -1,0 +1,714 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SectionHead from "../components/SectionHead.astro";
+import LifecycleOrbit from "../components/LifecycleOrbit.astro";
+import LifecycleExplorer from "../components/LifecycleExplorer.astro";
+import ModuleExplorer from "../components/ModuleExplorer.astro";
+import ProofBand from "../components/ProofBand.astro";
+import LogoWall from "../components/LogoWall.astro";
+import SectorMosaic from "../components/SectorMosaic.astro";
+import Photo from "../components/Photo.astro";
+import type { PhotoId } from "../data/photos";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, type Locale, type RouteId } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { norms } from "../data/company";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const h = c.home;
+const r = (id: string) => routes[id as RouteId][locale];
+const contactWith = (need: string) => `${routes.contact[locale]}?need=${encodeURIComponent(need)}`;
+const divisionPhotos = { consulting: "consulting", services: "engineer", solutions: "tech" } satisfies Record<string, PhotoId>;
+const flowPhotos: PhotoId[] = ["assetTag", "fieldScan", "warehouse"];
+---
+
+<BaseLayout locale={locale} alternates={alt("home")} title={`Integrade — ${h.title}`} description={h.description}>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow">{h.hero.eyebrow}</p>
+        <h1 class="display" set:html={h.hero.titleHtml} />
+        <p class="lead">{h.hero.lead}</p>
+        <div class="actions">
+          <a class="btn btn--gold" href={r("contact")}>{h.hero.primary}<span aria-hidden="true">→</span></a>
+          <a class="link-arrow" href={r("integradeOne")}>{h.hero.secondary}<span aria-hidden="true">→</span></a>
+        </div>
+        <p class="hero__signature">{h.hero.signature}</p>
+      </div>
+      <LifecycleOrbit labels={c.lifecycle.stages.map((s) => s.short)} center={h.hero.visualCenter} ariaLabel={h.hero.visualLabel} />
+    </div>
+    <div class="hero__strip">
+      <div class="wrap hero__strip-inner">
+        {h.divisions.items.map((d) => (
+          <a href={r(d.route)}>
+            <span class="hero__strip-no">{d.no}</span>
+            <span class="hero__strip-name">Integrade {d.name}</span>
+            <span class="hero__strip-role">{d.role}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Proof -->
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={h.proof.eyebrow} title={h.proof.title} stacked />
+      <ProofBand locale={locale} />
+      <div class="mt-l">
+        <SectorMosaic locale={locale} />
+      </div>
+      <p class="small" style="margin-top:20px">{h.proof.source}</p>
+    </div>
+  </section>
+
+  <!-- Divisions -->
+  <section class="section section--pale">
+    <div class="wrap">
+      <SectionHead eyebrow={h.divisions.eyebrow} titleHtml={h.divisions.titleHtml} lead={h.divisions.lead} />
+      <div class="divisions">
+        {h.divisions.items.map((d) => (
+          <a class="division" href={r(d.route)}>
+            <div class="division__media">
+              <Photo id={divisionPhotos[d.key as keyof typeof divisionPhotos]} locale={locale} sizes="(max-width: 960px) 100vw, 33vw" />
+            </div>
+            <div class="division__top">
+              <span class="division__no">{d.no}</span>
+              <span class="division__arrow" aria-hidden="true">↗</span>
+            </div>
+            <p class="division__brand">Integrade</p>
+            <h3 class="division__name">{d.name}</h3>
+            <p class="division__role">{d.role}</p>
+            <p class="division__text">{d.text}</p>
+            <ul class="ticks">
+              {d.bullets.map((b) => <li>{b}</li>)}
+            </ul>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Asset Intelligence -->
+  <section class="section">
+    <div class="wrap intel">
+      <div>
+        <p class="eyebrow">{h.intelligence.eyebrow}</p>
+        <h2 class="h2">{h.intelligence.title}</h2>
+        <p class="lead intel__lead">{h.intelligence.lead}</p>
+      </div>
+      <ol class="rule-list intel__list">
+        {h.intelligence.pillars.map((p) => (
+          <li>
+            <span class="rule-list__no">{p.no}</span>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Lifecycle -->
+  <section class="section section--darker">
+    <div class="wrap">
+      <SectionHead eyebrow={h.lifecycle.eyebrow} title={h.lifecycle.title} lead={h.lifecycle.lead} />
+      <LifecycleExplorer locale={locale} id="home-lc" dark />
+    </div>
+  </section>
+
+  <!-- Integrade One -->
+  <section class="section" id="integrade-one">
+    <div class="wrap">
+      <div class="one-head">
+        <div>
+          <p class="eyebrow">{h.one.eyebrow}</p>
+          <h2 class="h2">{h.one.title}</h2>
+        </div>
+        <div>
+          <p class="lead">{h.one.lead}</p>
+          <div class="actions">
+            <a class="btn btn--navy" href={r("integradeOne")}>{h.one.primary}<span aria-hidden="true">→</span></a>
+            <a class="link-arrow" href={contactWith("software")}>{h.one.secondary}<span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+      <ModuleExplorer locale={locale} id="home-mx" />
+      <p class="small mt-0" style="margin-top:16px">{c.modules.labels.scope}</p>
+    </div>
+  </section>
+
+  <!-- Physical to digital -->
+  <section class="section section--pale">
+    <div class="wrap">
+      <SectionHead eyebrow={h.physical.eyebrow} title={h.physical.title} lead={h.physical.lead} />
+      <div class="flow">
+        {h.physical.steps.map((s, i) => (
+          <article class="flow__step">
+            <div class="flow__media">
+              <Photo id={flowPhotos[i]} locale={locale} sizes="(max-width: 860px) 100vw, 33vw" />
+            </div>
+            <span class="flow__no">{s.no}</span>
+            <h3 class="h3">{s.title}</h3>
+            <p>{s.text}</p>
+            <a class="link-arrow" href={r(s.route)}>{s.link}<span aria-hidden="true">→</span></a>
+            {i < h.physical.steps.length - 1 && <span class="flow__arrow" aria-hidden="true">→</span>}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sectors -->
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={h.sectors.eyebrow} title={h.sectors.title} lead={h.sectors.lead} />
+      <LogoWall locale={locale} compact />
+      <div class="actions">
+        <a class="btn btn--outline" href={r("clients")}>{h.sectors.cta}<span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compliance -->
+  <section class="section section--dark section--tight">
+    <div class="wrap compliance">
+      <div>
+        <p class="eyebrow">{h.compliance.eyebrow}</p>
+        <h2 class="h2 compliance__title">{h.compliance.title}</h2>
+      </div>
+      <div>
+        <p class="lead">{h.compliance.lead}</p>
+        <ul class="chips">
+          {norms.map((n) => (
+            <li class="chip"><strong>{n.code}</strong>{n.label[locale]}</li>
+          ))}
+        </ul>
+        <p class="note" style="margin-top:24px">{h.compliance.note}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Approach -->
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={h.approach.eyebrow} title={h.approach.title} stacked />
+      <ol class="approach">
+        {h.approach.steps.map((s) => (
+          <li>
+            <span class="approach__no">{s.no}</span>
+            <h3 class="h3">{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Router -->
+  <section class="section section--paper">
+    <div class="wrap">
+      <SectionHead eyebrow={h.router.eyebrow} title={h.router.title} stacked />
+      <div class="grid grid--3">
+        {h.router.items.map((item) => (
+          <a class="card router" href={contactWith(item.need)}>
+            <h3>{item.label}</h3>
+            <p>{item.text}</p>
+            <span class="router__arrow" aria-hidden="true">→</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} />
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    background: var(--navy);
+    color: #cfdde8;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at 75% 45%, #000 0%, transparent 70%);
+    z-index: -1;
+  }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 64px);
+    align-items: center;
+    padding-top: clamp(56px, 7vw, 104px);
+    padding-bottom: clamp(56px, 6vw, 88px);
+  }
+
+  .hero h1 {
+    color: var(--white);
+  }
+
+  .hero h1 :global(strong) {
+    font-weight: 600;
+    color: var(--white);
+    background: linear-gradient(transparent 90%, var(--gold) 90%);
+  }
+
+  .hero :global(.display) {
+    font-size: clamp(42px, 5.4vw, 80px);
+  }
+
+  .hero .lead {
+    margin-top: 28px;
+    max-width: 54ch;
+  }
+
+  .hero__signature {
+    margin: 48px 0 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 19px;
+    color: #9fbad0;
+  }
+
+  .hero__strip {
+    border-top: 1px solid var(--line-dark);
+    background: rgba(8, 26, 46, 0.35);
+  }
+
+  .hero__strip-inner {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero__strip a {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 16px;
+    padding: 24px 24px 26px 0;
+    transition: background 0.2s ease;
+  }
+
+  .hero__strip a + a {
+    padding-left: 24px;
+    border-left: 1px solid var(--line-dark);
+  }
+
+  .hero__strip a:hover .hero__strip-name {
+    color: var(--gold);
+  }
+
+  .hero__strip-no {
+    grid-row: span 2;
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--gold);
+    padding-top: 4px;
+  }
+
+  .hero__strip-name {
+    color: var(--white);
+    font-weight: 600;
+    font-size: 16px;
+    transition: color 0.2s ease;
+  }
+
+  .hero__strip-role {
+    font-size: 14px;
+    color: #9fbad0;
+  }
+
+  @media (max-width: 960px) {
+    .hero__grid {
+      grid-template-columns: 1fr;
+    }
+    .hero :global(.orbit) {
+      justify-self: center;
+      max-width: 480px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .hero__strip-inner {
+      grid-template-columns: 1fr;
+    }
+    .hero__strip a,
+    .hero__strip a + a {
+      padding: 18px 0;
+      border-left: 0;
+    }
+    .hero__strip a + a {
+      border-top: 1px solid var(--line-dark);
+    }
+  }
+
+  /* Divisions */
+  .divisions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .division {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    padding: clamp(28px, 3vw, 44px);
+    min-height: 520px;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  .division__top {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 28px;
+  }
+
+  .division__media {
+    --pad: clamp(28px, 3vw, 44px);
+    position: relative;
+    margin: calc(var(--pad) * -1) calc(var(--pad) * -1) 28px;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--navy);
+  }
+
+  .division__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, opacity 0.3s ease;
+  }
+
+  .division__media::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 64px;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .division:hover .division__media :global(img) {
+    transform: scale(1.05);
+    opacity: 0.85;
+  }
+
+  .flow__media {
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: var(--navy);
+  }
+
+  .flow__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .division__no {
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--teal-600);
+  }
+
+  .division__arrow {
+    font-size: 22px;
+    color: var(--muted);
+    transition: transform 0.25s ease, color 0.25s ease;
+  }
+
+  .division__brand {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .division__name {
+    font-size: clamp(36px, 3.6vw, 52px);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    margin-bottom: 10px;
+  }
+
+  .division__role {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--teal-600);
+    margin-bottom: 22px;
+  }
+
+  .division__text {
+    color: var(--muted);
+    font-size: 15.5px;
+    margin-bottom: 22px;
+  }
+
+  .division .ticks {
+    margin-bottom: 0;
+  }
+
+  .division:hover {
+    background: var(--navy);
+  }
+
+  .division:hover .division__name,
+  .division:hover .ticks li {
+    color: var(--white);
+  }
+
+  .division:hover .division__brand,
+  .division:hover .division__text {
+    color: #b9cddb;
+  }
+
+  .division:hover .division__role,
+  .division:hover .division__no {
+    color: var(--gold);
+  }
+
+  .division:hover .division__arrow {
+    color: var(--gold);
+    transform: translate(3px, -3px);
+  }
+
+  .division:hover .ticks li::before {
+    background: var(--gold);
+  }
+
+  @media (max-width: 960px) {
+    .divisions {
+      grid-template-columns: 1fr;
+    }
+    .division {
+      min-height: 0;
+    }
+    .division__top {
+      padding-bottom: 32px;
+    }
+  }
+
+  /* Intelligence */
+  .intel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: clamp(40px, 7vw, 120px);
+    align-items: start;
+  }
+
+  .intel__lead {
+    margin-top: 28px;
+  }
+
+  .intel__list > li {
+    grid-template-columns: 56px minmax(0, 0.7fr) minmax(0, 1.3fr);
+  }
+
+  @media (max-width: 900px) {
+    .intel {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* One */
+  .one-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(28px, 6vw, 96px);
+    align-items: end;
+    margin-bottom: 48px;
+  }
+
+  .one-head .actions {
+    margin-top: 28px;
+  }
+
+  @media (max-width: 860px) {
+    .one-head {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Flow */
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 4vw, 64px);
+  }
+
+  .flow__step {
+    position: relative;
+    border-top: 2px solid var(--navy);
+    padding-top: 26px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flow__no {
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--teal-600);
+    margin-bottom: 18px;
+  }
+
+  .flow__step h3 {
+    margin-bottom: 14px;
+  }
+
+  .flow__step p {
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+
+  .flow__step .link-arrow {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  .flow__arrow {
+    position: absolute;
+    top: -15px;
+    right: calc(clamp(24px, 4vw, 64px) / -2 - 14px);
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  @media (max-width: 860px) {
+    .flow {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .flow__arrow {
+      display: none;
+    }
+  }
+
+  /* Compliance */
+  .compliance {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .compliance__title {
+    font-size: clamp(28px, 3vw, 42px);
+  }
+
+  .compliance .lead {
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 860px) {
+    .compliance {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Approach */
+  .approach {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    counter-reset: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .approach li {
+    padding: 28px 28px 8px 0;
+  }
+
+  .approach li + li {
+    padding-left: 28px;
+    border-left: 1px solid var(--line);
+  }
+
+  .approach__no {
+    display: block;
+    font-size: 44px;
+    font-weight: 250;
+    letter-spacing: -0.04em;
+    color: var(--teal);
+    margin-bottom: 18px;
+    line-height: 1;
+  }
+
+  .approach h3 {
+    margin-bottom: 10px;
+  }
+
+  .approach p {
+    color: var(--muted);
+    font-size: 15.5px;
+  }
+
+  @media (max-width: 900px) {
+    .approach {
+      grid-template-columns: 1fr 1fr;
+    }
+    .approach li:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .approach {
+      grid-template-columns: 1fr;
+    }
+    .approach li,
+    .approach li + li {
+      padding: 22px 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--line);
+    }
+  }
+
+  /* Router */
+  .router {
+    min-height: 168px;
+  }
+
+  .router p {
+    margin-bottom: 0;
+  }
+
+  .router__arrow {
+    position: absolute;
+    right: 28px;
+    bottom: 24px;
+    font-size: 20px;
+    color: var(--teal);
+    transition: transform 0.2s ease;
+  }
+
+  .router:hover .router__arrow {
+    transform: translateX(4px);
+  }
+</style>

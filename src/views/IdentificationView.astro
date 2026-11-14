@@ -1,0 +1,203 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, techPath, type Locale, type TechId } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const i = c.identification;
+const techs = c.techs.items;
+---
+
+<BaseLayout locale={locale} alternates={alt("identification")} title={i.title} description={i.description} current="solutions">
+  <PageHero
+    photo="assetTag"
+    locale={locale}
+    eyebrow={i.hero.eyebrow}
+    title={i.hero.title}
+    lead={i.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[
+      { label: "Integrade", href: routes.home[locale] },
+      { label: "Solutions", href: routes.solutions[locale] },
+      { label: c.ui.mega.solutions.groups[1].title },
+    ]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href={`${routes.contact[locale]}?need=identificacao`}>{i.hero.primary}<span aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={i.techs.eyebrow} title={i.techs.title} stacked />
+      <div class="techs">
+        {techs.map((t, n) => (
+          <a class="tech" href={techPath(locale, t.id as TechId)}>
+            <span class="tech__no">{String(n + 1).padStart(2, "0")}</span>
+            <h3 class="tech__name">{t.name}</h3>
+            <p>{t.summary}</p>
+            <span class="tech__arrow" aria-hidden="true">→</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--pale">
+    <div class="wrap opts">
+      <div>
+        <p class="eyebrow">{i.options.eyebrow}</p>
+        <h2 class="h2">{i.options.title}</h2>
+        <p class="note" style="margin-top:24px">{i.options.note}</p>
+      </div>
+      <ol class="rule-list opts__list">
+        {i.options.items.map((o, n) => (
+          <li>
+            <span class="rule-list__no">{String(n + 1).padStart(2, "0")}</span>
+            <h3>{o}</h3>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="wrap service">
+      <div>
+        <h2 class="h3">{i.service.title}</h2>
+        <p>{i.service.text}</p>
+      </div>
+      <a class="link-arrow" href={routes.services[locale]}>{i.service.link}<span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="identificacao" />
+</BaseLayout>
+
+<style>
+  .techs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  .tech {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 28px 64px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s ease;
+  }
+
+  .tech__no {
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--teal-600);
+    margin-bottom: 48px;
+  }
+
+  .tech__name {
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .tech p {
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0;
+  }
+
+  .tech__arrow {
+    position: absolute;
+    left: 28px;
+    bottom: 24px;
+    color: var(--teal);
+    font-size: 20px;
+    transition: transform 0.2s ease;
+  }
+
+  .tech:hover {
+    background: var(--navy);
+  }
+
+  .tech:hover .tech__name {
+    color: var(--white);
+  }
+
+  .tech:hover p {
+    color: #b9cddb;
+  }
+
+  .tech:hover .tech__no,
+  .tech:hover .tech__arrow {
+    color: var(--gold);
+  }
+
+  .tech:hover .tech__arrow {
+    transform: translateX(6px);
+  }
+
+  @media (max-width: 960px) {
+    .techs {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .techs {
+      grid-template-columns: 1fr;
+    }
+    .tech__no {
+      margin-bottom: 20px;
+    }
+  }
+
+  .opts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .opts__list > li {
+    grid-template-columns: 56px 1fr;
+  }
+
+  @media (max-width: 860px) {
+    .opts {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .service {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+    border-left: 3px solid var(--gold);
+    padding-left: 24px;
+  }
+
+  .service h2 {
+    margin-bottom: 8px;
+  }
+
+  .service p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 64ch;
+  }
+</style>

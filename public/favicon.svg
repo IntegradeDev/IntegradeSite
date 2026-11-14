@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Integrade">
+  <rect width="64" height="64" rx="12" fill="#102D4E" />
+  <polygon points="32,14 48,22 32,30 16,22" fill="#FFAA00" />
+  <path d="M16 34 L32 42 L48 34" stroke="#048BA8" stroke-width="5" fill="none" stroke-linecap="round" />
+  <path d="M16 44 L32 52 L48 44" stroke="#048BA8" stroke-width="5" fill="none" stroke-linecap="round" />
+</svg>

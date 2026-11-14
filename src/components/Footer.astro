@@ -1,0 +1,183 @@
+---
+import { routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { contact } from "../data/company";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const f = c.ui.footer;
+const year = new Date().getFullYear();
+---
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr__top">
+      <div class="ftr__brand">
+        <img src="/img/integrade-logo-negativo.png" alt="Integrade" width="170" height="38" loading="lazy" />
+        <p class="ftr__tagline">{f.tagline}</p>
+        <p class="ftr__statement">{f.statement}</p>
+        <p class="ftr__signature">Integrated Expertise. Intelligent Solutions.</p>
+      </div>
+
+      <div class="ftr__cols">
+        <div>
+          <p class="ftr__title">{f.divisions}</p>
+          <ul>
+            <li><a href={routes.consulting[locale]}>Integrade Consulting</a></li>
+            <li><a href={routes.services[locale]}>Integrade Services</a></li>
+            <li><a href={routes.solutions[locale]}>Integrade Solutions</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="ftr__title">{f.solutions}</p>
+          <ul>
+            <li><a href={routes.integradeOne[locale]}>Integrade One</a></li>
+            <li><a href={routes.apps[locale]}>One Apps</a></li>
+            <li><a href={routes.identification[locale]}>{c.ui.mega.solutions.groups[1].title}</a></li>
+            <li><a href={routes.equipment[locale]}>{c.ui.mega.solutions.groups[2].title}</a></li>
+            <li><a href={routes.outsourcing[locale]}>{c.ui.mega.services.links[1].label}</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="ftr__title">{f.company}</p>
+          <ul>
+            <li><a href={routes.about[locale]}>{c.ui.nav.about}</a></li>
+            <li><a href={routes.clients[locale]}>{c.ui.nav.clients}</a></li>
+            <li><a href={routes.contact[locale]}>{c.ui.nav.contact}</a></li>
+            <li><a href={contact.consultingUrl} target="_blank" rel="noopener">integradeconsulting.com.br ↗</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="ftr__title">{f.contact}</p>
+          <ul>
+            <li><a href={contact.phoneHref}>{contact.phoneDisplay}</a></li>
+            <li><a href={contact.whatsappHref} target="_blank" rel="noopener">{c.ui.whatsapp} {contact.phoneDisplay}</a></li>
+            <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+            <li>
+              <a href={contact.mapsHref} target="_blank" rel="noopener" class="ftr__address">
+                {contact.addressLines.map((line) => <span>{line}</span>)}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ftr__bottom">
+      <p>© {year} Integrade. {f.rights}</p>
+      <p>{contact.legalName} · {f.cnpj} {contact.cnpj}</p>
+      <p>{f.publicSector}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    background: var(--navy-950);
+    color: #a9bfd0;
+    font-size: 14.5px;
+  }
+
+  .ftr__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: clamp(40px, 6vw, 96px);
+    padding: clamp(56px, 7vw, 96px) 0 56px;
+  }
+
+  .ftr__brand img {
+    height: 36px;
+    width: auto;
+    margin-bottom: 28px;
+  }
+
+  .ftr__tagline {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .ftr__statement {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    color: var(--white);
+    max-width: 26ch;
+  }
+
+  .ftr__signature {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: #cfdde8;
+    font-size: 17px;
+    margin-top: 24px;
+  }
+
+  .ftr__cols {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+  }
+
+  .ftr__title {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 18px;
+  }
+
+  .ftr ul {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+
+  .ftr a:hover {
+    color: var(--white);
+  }
+
+  .ftr__address {
+    display: grid;
+    gap: 2px;
+  }
+
+  .ftr__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 32px;
+    padding: 24px 0 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 12.5px;
+    color: #7f97ab;
+  }
+
+  .ftr__bottom p {
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .ftr__top {
+      grid-template-columns: 1fr;
+    }
+    .ftr__cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .ftr__cols {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

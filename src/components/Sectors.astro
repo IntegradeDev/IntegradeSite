@@ -1,0 +1,85 @@
+---
+import type { Locale } from "../i18n/locales";
+import { clientSectors } from "../data/clients";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div class="sectors">
+  {clientSectors.map((s) => (
+    <section class="sectors__group">
+      <h3 class="sectors__name">
+        {s.name[locale]} <span>{s.clients.length}</span>
+      </h3>
+      <ul>
+        {s.clients.map((client) => <li>{client}</li>)}
+      </ul>
+    </section>
+  ))}
+</div>
+
+<style>
+  .sectors {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px clamp(32px, 4vw, 56px);
+  }
+
+  .sectors__name {
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .sectors__name span {
+    margin-left: 6px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .sectors ul {
+    list-style: none;
+    display: grid;
+    gap: 9px;
+    margin-top: 16px;
+  }
+
+  .sectors li {
+    position: relative;
+    padding-left: 14px;
+    font-size: 14.5px;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .sectors li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  @media (max-width: 960px) {
+    .sectors {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .sectors {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

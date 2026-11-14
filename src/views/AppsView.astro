@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const a = c.apps;
+const appsModule = c.modules.items.find((m) => m.slug === "one-apps")!;
+---
+
+<BaseLayout locale={locale} alternates={alt("apps")} title={a.title} description={a.description} current="one">
+  <PageHero
+    eyebrow={a.hero.eyebrow}
+    title={a.hero.title}
+    lead={a.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[
+      { label: "Integrade", href: routes.home[locale] },
+      { label: "Solutions", href: routes.solutions[locale] },
+      { label: "Integrade One", href: routes.integradeOne[locale] },
+      { label: "One Apps" },
+    ]}
+  >
+    <img slot="aside" class="apps-lockup" src="/img/one-apps-negativo.svg" alt="One Apps" width="330" height="90" />
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={a.family.eyebrow} title={a.family.title} lead={appsModule.need} />
+      <div class="grid grid--2">
+        <a class="card card--top" href={routes.oneCapture[locale]}>
+          <p class="card__kicker">{a.family.capture.kicker}</p>
+          <h3>{a.family.capture.title}</h3>
+          <p>{a.family.capture.text}</p>
+          <span class="link-arrow">{a.family.capture.link}<span aria-hidden="true">→</span></span>
+        </a>
+        <article class="card">
+          <p class="card__kicker">{a.family.next.kicker}</p>
+          <h3>{a.family.next.title}</h3>
+          <p>{a.family.next.text}</p>
+        </article>
+      </div>
+      <p class="note mt-l">{appsModule.relation}</p>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="software" />
+</BaseLayout>
+
+<style>
+  .apps-lockup {
+    width: min(100%, 300px);
+    height: auto;
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const o = c.oneCapture;
+---
+
+<BaseLayout locale={locale} alternates={alt("oneCapture")} title={o.title} description={o.description} current="one">
+  <PageHero
+    photo="fieldScan"
+    locale={locale}
+    eyebrow={o.hero.eyebrow}
+    title={o.hero.title}
+    lead={o.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[
+      { label: "Integrade", href: routes.home[locale] },
+      { label: "Integrade One", href: routes.integradeOne[locale] },
+      { label: "One Apps", href: routes.apps[locale] },
+      { label: "One Capture" },
+    ]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href={`${routes.contact[locale]}?need=software&origin=One%20Capture`}>{o.cta}<span aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap capture">
+      <div>
+        <p class="eyebrow">{o.purpose.eyebrow}</p>
+        <h2 class="h2">{o.purpose.title}</h2>
+      </div>
+      <div class="prose">
+        <p>{o.purpose.text}</p>
+        <div class="capture__status">
+          <h3 class="h3">{o.status.title}</h3>
+          <p>{o.status.text}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="software" />
+</BaseLayout>
+
+<style>
+  .capture {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .capture__status {
+    margin-top: 32px;
+    padding: 24px 28px;
+    border-left: 3px solid var(--gold);
+    background: var(--pale);
+  }
+
+  .capture__status h3 {
+    margin-bottom: 10px;
+  }
+
+  .capture__status p {
+    margin: 0;
+    font-size: 15.5px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 860px) {
+    .capture {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

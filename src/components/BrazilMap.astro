@@ -1,0 +1,404 @@
+---
+import type { Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { ESTADOS, MAPA_VIEWBOX, projetar } from "../data/brazilMap";
+import { localities, regions, totals } from "../data/clients";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const M = getCopy(locale).clients.map;
+const fill = (s: string, vars: Record<string, string | number>) =>
+  Object.entries(vars).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)), s);
+
+const byUf = new Map<string, { cities: typeof localities; total: number }>();
+for (const loc of localities) {
+  const entry = byUf.get(loc.uf) ?? { cities: [], total: 0 };
+  entry.cities.push(loc);
+  entry.total += loc.clients.length;
+  byUf.set(loc.uf, entry);
+}
+
+const NO_LABEL = new Set(["DF", "SE", "AL", "PB", "RN", "PE", "ES", "RJ"]);
+const color = (n?: number) => (!n ? "#e6edf2" : n >= 10 ? "#102d4e" : n >= 4 ? "#30558f" : "#7c9fc9");
+const regionOf = (uf: string) => regions.find((r) => r.ufs.includes(uf))?.name[locale] ?? "";
+const states = ESTADOS as { uf: string; nome: string; d: string; cx: number; cy: number }[];
+const served = states.filter((s) => byUf.has(s.uf));
+---
+
+<div class="bm" data-map>
+  <div class="bm__text">
+    <p class="eyebrow">{M.eyebrow}</p>
+    <h2 class="h2">{M.title}</h2>
+    <p class="lead bm__lead">{fill(M.text, { ufs: totals.ufs, regions: totals.regions })}</p>
+
+    <dl class="bm__stats">
+      <div><dd>{totals.ufs}</dd><dt>{getCopy(locale).clients.stats.ufs}</dt></div>
+      <div><dd>{totals.municipalities}</dd><dt>{getCopy(locale).clients.stats.municipalities}</dt></div>
+      <div><dd>{totals.regions}/5</dd><dt>{getCopy(locale).clients.stats.regions}</dt></div>
+    </dl>
+
+    <div class="bm__panel" aria-live="polite">
+      <div data-panel="summary">
+        <p class="bm__panel-title">{M.summaryTitle}</p>
+        <p class="small">{M.hint}</p>
+        <ul class="bm__regions">
+          {regions.map((r) => (
+            <li>
+              <span class="bm__region">{r.name[locale]}</span>
+              <span class="bm__ufs">
+                {r.ufs.filter((uf) => byUf.has(uf)).map((uf) => (
+                  <button type="button" data-uf={uf}>{uf}</button>
+                ))}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {served.map((s) => (
+        <div data-panel={s.uf} hidden>
+          <div class="bm__panel-head">
+            <p class="bm__panel-title">{s.nome} <span>· {regionOf(s.uf)}</span></p>
+            <button type="button" class="bm__back" data-back>{M.back}</button>
+          </div>
+          <ul class="bm__cities">
+            {byUf.get(s.uf)!.cities.map((c) => (
+              <li>
+                <p class="bm__city">{c.city}</p>
+                <p class="bm__clients">{c.clients.join(" · ")}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <figure class="bm__figure">
+    <svg viewBox={MAPA_VIEWBOX} role="img" aria-labelledby="bm-title" data-svg>
+      <title id="bm-title">{fill(M.ariaMap, { ufs: totals.ufs })}</title>
+      <g>
+        {states.map((s) => {
+          const d = byUf.get(s.uf);
+          return (
+            <path
+              d={s.d}
+              fill={color(d?.total)}
+              data-fill={color(d?.total)}
+              data-uf={d ? s.uf : undefined}
+              class:list={["bm__state", { "is-served": !!d }]}
+              tabindex={d ? 0 : -1}
+              aria-label={d ? fill(M.stateAria, { state: s.nome, count: d.total }) : s.nome}
+            />
+          );
+        })}
+      </g>
+      <g pointer-events="none">
+        {states.filter((s) => !NO_LABEL.has(s.uf)).map((s) => (
+          <text x={s.cx} y={s.cy} text-anchor="middle" dominant-baseline="central" class:list={["bm__label", { "is-served": byUf.has(s.uf) }]}>{s.uf}</text>
+        ))}
+      </g>
+      <g pointer-events="none">
+        {localities.map((loc) => {
+          const [x, y] = projetar(loc.coord[0], loc.coord[1]);
+          const r = 4.5 + Math.min(5, (Math.sqrt(loc.clients.length) - 1) * 2);
+          return (
+            <g data-dot={loc.uf}>
+              {loc.clients.length >= 5 && <circle cx={x} cy={y} r={r + 5} class="bm__pulse" />}
+              <circle cx={x} cy={y} r={r} class="bm__dot" />
+            </g>
+          );
+        })}
+      </g>
+    </svg>
+    <figcaption class="bm__legend">
+      <span><i style="background:#102d4e"></i>{M.legend.high}</span>
+      <span><i style="background:#30558f"></i>{M.legend.mid}</span>
+      <span><i style="background:#7c9fc9"></i>{M.legend.low}</span>
+      <span><i class="bm__legend-dot"></i>{M.legend.city}</span>
+    </figcaption>
+  </figure>
+</div>
+
+<style>
+  .bm {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: start;
+  }
+
+  .bm__lead {
+    margin-top: 22px;
+  }
+
+  .bm__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 32px 0 0;
+    border: 1px solid var(--line);
+    background: var(--white);
+  }
+
+  .bm__stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 16px 12px;
+    text-align: center;
+  }
+
+  .bm__stats > div + div {
+    border-left: 1px solid var(--line);
+  }
+
+  .bm__stats dd {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: var(--navy);
+  }
+
+  .bm__stats dt {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .bm__panel {
+    margin-top: 20px;
+    min-height: 260px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+  }
+
+  .bm__panel-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .bm__panel-title span {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .bm__panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .bm__back {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-600);
+  }
+
+  .bm__regions {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .bm__regions li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+  }
+
+  .bm__region {
+    width: 112px;
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 550;
+    color: var(--ink);
+  }
+
+  .bm__ufs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .bm__ufs button {
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+    background: var(--white);
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.05em;
+    color: var(--navy);
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+
+  .bm__ufs button:hover {
+    border-color: var(--navy);
+  }
+
+  .bm__cities {
+    list-style: none;
+    display: grid;
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .bm__city {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-600);
+    margin-bottom: 2px;
+  }
+
+  .bm__clients {
+    font-size: 14.5px;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .bm__figure {
+    margin: 0;
+  }
+
+  .bm__figure svg {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .bm__state {
+    stroke: #fff;
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+    outline: none;
+    transition: fill 0.2s ease;
+  }
+
+  .bm__state.is-served {
+    cursor: pointer;
+  }
+
+  .bm__state.is-active {
+    fill: var(--gold);
+  }
+
+  .bm__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    fill: #9aabbb;
+    font-family: var(--font-sans);
+  }
+
+  .bm__label.is-served {
+    fill: rgba(255, 255, 255, 0.85);
+  }
+
+  .bm__dot {
+    fill: var(--gold);
+    stroke: #fff;
+    stroke-width: 1.5;
+  }
+
+  [data-dot].is-active .bm__dot {
+    fill: var(--navy);
+  }
+
+  .bm__pulse {
+    fill: var(--gold);
+    opacity: 0.25;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: bm-pulse 2.4s ease-out infinite;
+  }
+
+  @keyframes bm-pulse {
+    0% {
+      transform: scale(0.7);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
+
+  .bm__legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 20px;
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .bm__legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bm__legend i {
+    width: 12px;
+    height: 12px;
+  }
+
+  .bm__legend .bm__legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  @media (max-width: 960px) {
+    .bm {
+      grid-template-columns: 1fr;
+    }
+    .bm__figure {
+      order: -1;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-map]").forEach((root) => {
+    const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-panel]"));
+    const states = Array.from(root.querySelectorAll<SVGPathElement>("path[data-uf]"));
+    const dots = Array.from(root.querySelectorAll<SVGGElement>("[data-dot]"));
+    const svg = root.querySelector<SVGSVGElement>("[data-svg]");
+
+    const show = (uf: string | null) => {
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== (uf ?? "summary")));
+      states.forEach((s) => s.classList.toggle("is-active", s.dataset.uf === uf));
+      dots.forEach((d) => d.classList.toggle("is-active", d.dataset.dot === uf));
+    };
+
+    states.forEach((s) => {
+      const uf = s.dataset.uf!;
+      s.addEventListener("mouseenter", () => show(uf));
+      s.addEventListener("focus", () => show(uf));
+      s.addEventListener("click", () => show(uf));
+    });
+    svg?.addEventListener("mouseleave", () => show(null));
+    root.querySelectorAll<HTMLButtonElement>("button[data-uf]").forEach((b) => b.addEventListener("click", () => show(b.dataset.uf!)));
+    root.querySelectorAll<HTMLButtonElement>("[data-back]").forEach((b) => b.addEventListener("click", () => show(null)));
+  });
+</script>

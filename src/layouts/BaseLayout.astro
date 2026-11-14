@@ -1,0 +1,77 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppFloat from "../components/WhatsAppFloat.astro";
+import { locales, htmlLang, type Locale, type Alternates } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { contact } from "../data/company";
+
+interface Props {
+  locale: Locale;
+  alternates: Alternates;
+  title: string;
+  description: string;
+  current?: string;
+}
+
+const { locale, alternates, title, description, current } = Astro.props;
+const c = getCopy(locale);
+const abs = (path: string) => new URL(path, Astro.site).toString();
+const canonical = abs(alternates[locale]);
+const fullTitle = title.includes("Integrade") ? title : `${title} | Integrade`;
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Integrade",
+  legalName: contact.legalName,
+  url: abs("/"),
+  logo: abs("/img/integrade-logo.png"),
+  foundingDate: String(contact.since),
+  email: contact.email,
+  telephone: contact.phoneIntl,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Av. Dr. Chucri Zaidan, 1649 — Conj. 242",
+    addressLocality: "São Paulo",
+    addressRegion: "SP",
+    postalCode: "04711-130",
+    addressCountry: "BR",
+  },
+  sameAs: [contact.consultingUrl],
+};
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={abs(alternates[l])} />)}
+    <link rel="alternate" hreflang="x-default" href={abs(alternates["pt-br"])} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#102d4e" />
+    <meta property="og:site_name" content="Integrade" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={abs("/img/og-integrade.png")} />
+    <meta property="og:locale" content={htmlLang[locale].replace("-", "_")} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{c.ui.skip}</a>
+    <Header locale={locale} alternates={alternates} current={current} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+    <WhatsAppFloat locale={locale} current={current} />
+  </body>
+</html>

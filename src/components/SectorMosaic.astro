@@ -1,0 +1,120 @@
+---
+import Photo from "./Photo.astro";
+import type { Locale } from "../i18n/locales";
+import type { PhotoId } from "../data/photos";
+import { clientSectors } from "../data/clients";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const tiles: { photo: PhotoId; sector: number; clients: string[] }[] = [
+  { photo: "energy", sector: 0, clients: ["Eletrobras", "FURNAS", "Eletronuclear"] },
+  { photo: "port", sector: 1, clients: ["Porto de Santos", "EMAP", "Porto de Suape"] },
+  { photo: "water", sector: 2, clients: ["SABESP", "SEMAE Piracicaba"] },
+  { photo: "hospital", sector: 5, clients: ["Hospital Alemão Oswaldo Cruz", "GHC"] },
+  { photo: "publicSector", sector: 3, clients: ["Secretaria de Estado da Saúde", "Prefeitura de Pindamonhangaba", "Câmara de Santa Maria"] },
+];
+---
+
+<ul class="mosaic">
+  {tiles.map((t, i) => (
+    <li class:list={["mosaic__tile", { "mosaic__tile--wide": i === 0 }]}>
+      <Photo id={t.photo} locale={locale} sizes={i === 0 ? "(max-width: 900px) 100vw, 40vw" : "(max-width: 900px) 50vw, 20vw"} />
+      <div class="mosaic__caption">
+        <p class="mosaic__sector">{clientSectors[t.sector].name[locale]}</p>
+        <p class="mosaic__clients">{t.clients.join(" · ")}</p>
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .mosaic {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 260px 260px;
+    gap: 8px;
+  }
+
+  .mosaic__tile {
+    position: relative;
+    overflow: hidden;
+    background: var(--navy);
+  }
+
+  .mosaic__tile--wide {
+    grid-row: span 2;
+  }
+
+  .mosaic__tile :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .mosaic__tile:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .mosaic__tile::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(8, 26, 46, 0) 35%, rgba(8, 26, 46, 0.88) 100%);
+  }
+
+  .mosaic__caption {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 18px;
+    z-index: 1;
+  }
+
+  .mosaic__sector {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .mosaic__clients {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--white);
+  }
+
+  .mosaic__tile--wide .mosaic__clients {
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  @media (max-width: 900px) {
+    .mosaic {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 280px 200px 200px;
+    }
+    .mosaic__tile--wide {
+      grid-column: span 2;
+      grid-row: auto;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .mosaic {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-auto-rows: 200px;
+    }
+    .mosaic__tile--wide {
+      grid-column: auto;
+    }
+  }
+</style>

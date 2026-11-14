@@ -1,0 +1,14 @@
+---
+import ModuleView from "../../../../../../views/ModuleView.astro";
+import { getCopy } from "../../../../../../copy";
+
+export function getStaticPaths() {
+  return getCopy("pt-br")
+    .modules.items.filter((m) => m.slug !== "one-apps")
+    .map((m) => ({ params: { slug: m.slug } }));
+}
+
+const { slug } = Astro.params;
+---
+
+<ModuleView locale="pt-br" slug={slug!} />

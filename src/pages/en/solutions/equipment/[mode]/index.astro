@@ -1,0 +1,12 @@
+---
+import ModeView from "../../../../../views/ModeView.astro";
+import { modeSlugs, type ModeId } from "../../../../../i18n/locales";
+
+export function getStaticPaths() {
+  return (Object.keys(modeSlugs) as ModeId[]).map((id) => ({ params: { mode: modeSlugs[id]["en"] }, props: { id } }));
+}
+
+const { id } = Astro.props;
+---
+
+<ModeView locale="en" id={id} />

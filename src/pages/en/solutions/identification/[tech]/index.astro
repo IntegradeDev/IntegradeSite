@@ -1,0 +1,12 @@
+---
+import TechView from "../../../../../views/TechView.astro";
+import { techSlugs, type TechId } from "../../../../../i18n/locales";
+
+export function getStaticPaths() {
+  return (Object.keys(techSlugs) as TechId[]).map((id) => ({ params: { tech: techSlugs[id]["en"] }, props: { id } }));
+}
+
+const { id } = Astro.props;
+---
+
+<TechView locale="en" id={id} />

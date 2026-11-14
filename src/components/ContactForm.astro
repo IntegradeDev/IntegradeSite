@@ -1,0 +1,107 @@
+---
+import type { Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { contact } from "../data/company";
+
+interface Props {
+  locale: Locale;
+  needs?: { value: string; label: string }[];
+  preset?: string;
+  origin?: string;
+  detailsOpen?: boolean;
+}
+
+const { locale, needs, preset, origin = "", detailsOpen = false } = Astro.props;
+const c = getCopy(locale);
+const f = c.ui.form;
+const options = needs ?? c.contact.needs;
+const hasExtra = Astro.slots.has("default");
+const formId = `form-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<form class="form" id={formId} data-contact-form data-email={contact.email} data-success={f.success} data-origin={origin} novalidate={false}>
+  <div class="form__row">
+    <div class="field">
+      <label for={`${formId}-name`}>{f.name} *</label>
+      <input id={`${formId}-name`} name={f.name} type="text" required autocomplete="name" />
+    </div>
+    <div class="field">
+      <label for={`${formId}-company`}>{f.company} *</label>
+      <input id={`${formId}-company`} name={f.company} type="text" required autocomplete="organization" />
+    </div>
+  </div>
+  <div class="form__row">
+    <div class="field">
+      <label for={`${formId}-email`}>{f.email} *</label>
+      <input id={`${formId}-email`} name={f.email} type="email" required autocomplete="email" />
+    </div>
+    <div class="field">
+      <label for={`${formId}-phone`}>{f.phone}</label>
+      <input id={`${formId}-phone`} name={f.phone} type="tel" autocomplete="tel" />
+    </div>
+  </div>
+  <div class="field">
+    <label for={`${formId}-need`}>{f.need} *</label>
+    <select id={`${formId}-need`} name={f.need} required data-need>
+      <option value="">{f.select}</option>
+      {options.map((o) => (
+        <option value={o.value} selected={o.value === preset}>{o.label}</option>
+      ))}
+    </select>
+  </div>
+  {hasExtra && (
+    <details open={detailsOpen}>
+      <summary>{f.details}</summary>
+      <slot />
+    </details>
+  )}
+  <div class="field">
+    <label for={`${formId}-message`}>{f.message} *</label>
+    <textarea id={`${formId}-message`} name={f.message} required></textarea>
+  </div>
+  <p class="small">* {f.required}. {f.disclaimer}</p>
+  <div class="form-status" role="status" aria-live="polite" data-status></div>
+  <div class="actions mt-0">
+    <button class="btn btn--navy" type="submit">{f.submit}<span aria-hidden="true">→</span></button>
+    <a class="link-arrow" href={contact.whatsappHref} target="_blank" rel="noopener">{c.ui.whatsapp} {contact.phoneDisplay}<span aria-hidden="true">↗</span></a>
+  </div>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>("[data-contact-form]").forEach((form) => {
+    const params = new URLSearchParams(window.location.search);
+    const need = params.get("need");
+    const select = form.querySelector<HTMLSelectElement>("[data-need]");
+    if (need && select && Array.from(select.options).some((o) => o.value === need)) {
+      select.value = need;
+    }
+    const origin = params.get("origin") || form.dataset.origin || "";
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      const data = new FormData(form);
+      const lines: string[] = [];
+      data.forEach((value, key) => {
+        const text = String(value).trim();
+        if (!text) return;
+        const shown = key === select?.name && select ? select.options[select.selectedIndex].text : text;
+        lines.push(`${key}: ${shown}`);
+      });
+      if (origin) lines.push(`Origem: ${origin}`);
+      lines.push(`Página: ${window.location.href}`);
+
+      const needLabel = select ? select.options[select.selectedIndex].text : "";
+      const subject = `Integrade — ${needLabel}`;
+      const email = form.dataset.email || "";
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+
+      const status = form.querySelector<HTMLElement>("[data-status]");
+      if (status) {
+        status.textContent = form.dataset.success || "";
+        status.classList.add("is-visible");
+      }
+    });
+  });
+</script>

@@ -1,0 +1,615 @@
+---
+import { locales, localeShort, localeNames, routes, type Locale, type Alternates, type RouteId } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { contact } from "../data/company";
+
+interface Props {
+  locale: Locale;
+  alternates: Alternates;
+  current?: string;
+}
+
+const { locale, alternates, current } = Astro.props;
+const c = getCopy(locale);
+const r = (id: string) => routes[id as RouteId][locale];
+const m = c.ui.mega;
+const isActive = (section: string) => current === section;
+---
+
+<header class="hdr" data-header>
+  <div class="hdr__utility">
+    <div class="wrap hdr__utility-inner">
+      <span class="hdr__claim">{c.meta.siteName} · {c.ui.footer.tagline}</span>
+      <div class="hdr__utility-links">
+        <a href={contact.phoneHref}>{contact.phoneDisplay}</a>
+        <a href={contact.whatsappHref} target="_blank" rel="noopener">{c.ui.whatsapp}</a>
+        <nav class="hdr__langs" aria-label={c.ui.language}>
+          {locales.map((l) => (
+            <a href={alternates[l]} hreflang={l} lang={l} aria-current={l === locale ? "true" : undefined} title={localeNames[l]}>
+              {localeShort[l]}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdr__main">
+    <div class="wrap hdr__main-inner">
+      <a class="hdr__logo" href={routes.home[locale]} aria-label={`Integrade — ${c.ui.home}`}>
+        <img src="/img/integrade-logo.png" alt="Integrade" width="164" height="37" />
+      </a>
+
+      <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="hdr-nav" data-burger>
+        <span class="hdr__burger-lines" aria-hidden="true"><i></i><i></i></span>
+        <span class="hdr__burger-label">{c.ui.menu}</span>
+      </button>
+
+      <nav class="nav" id="hdr-nav" aria-label={c.ui.mainNav} data-nav>
+        <ul class="nav__list">
+          <li class="nav__item">
+            <button class:list={["nav__trigger", { "is-current": isActive("consulting") }]} type="button" aria-expanded="false" aria-controls="mega-consulting" data-trigger>
+              {c.ui.nav.consulting}<span class="nav__chev" aria-hidden="true"></span>
+            </button>
+            <div class="mega" id="mega-consulting" data-mega hidden>
+              <div class="wrap mega__inner">
+                <div class="mega__intro">
+                  <p class="mega__kicker">01 · {c.ui.nav.consulting}</p>
+                  <p class="mega__title">{m.consulting.title}</p>
+                  <p class="mega__text">{m.consulting.text}</p>
+                </div>
+                <ul class="mega__links">
+                  {m.consulting.links.map((l) => (
+                    <li><a href={r(l.route)}>{l.label}<span aria-hidden="true">→</span></a></li>
+                  ))}
+                  <li><a href={contact.consultingUrl} target="_blank" rel="noopener">{m.consulting.external}<span aria-hidden="true">↗</span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="nav__item">
+            <button class:list={["nav__trigger", { "is-current": isActive("services") }]} type="button" aria-expanded="false" aria-controls="mega-services" data-trigger>
+              {c.ui.nav.services}<span class="nav__chev" aria-hidden="true"></span>
+            </button>
+            <div class="mega" id="mega-services" data-mega hidden>
+              <div class="wrap mega__inner">
+                <div class="mega__intro">
+                  <p class="mega__kicker">02 · {c.ui.nav.services}</p>
+                  <p class="mega__title">{m.services.title}</p>
+                  <p class="mega__text">{m.services.text}</p>
+                </div>
+                <ul class="mega__links">
+                  {m.services.links.map((l) => (
+                    <li><a href={r(l.route)}>{l.label}<span aria-hidden="true">→</span></a></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="nav__item">
+            <button class:list={["nav__trigger", { "is-current": isActive("solutions") }]} type="button" aria-expanded="false" aria-controls="mega-solutions" data-trigger>
+              {c.ui.nav.solutions}<span class="nav__chev" aria-hidden="true"></span>
+            </button>
+            <div class="mega" id="mega-solutions" data-mega hidden>
+              <div class="wrap mega__inner mega__inner--wide">
+                <div class="mega__intro">
+                  <p class="mega__kicker">03 · {c.ui.nav.solutions}</p>
+                  <p class="mega__title">{m.solutions.title}</p>
+                  <p class="mega__text">{m.solutions.text}</p>
+                  <a class="mega__overview" href={r("solutions")}>{c.ui.explore} {m.solutions.title}<span aria-hidden="true">→</span></a>
+                </div>
+                {m.solutions.groups.map((g) => (
+                  <div class="mega__group">
+                    <p class="mega__group-title">{g.title}</p>
+                    <ul class="mega__links">
+                      {g.links.map((l) => (
+                        <li><a href={r(l.route)}>{l.label}<span aria-hidden="true">→</span></a></li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </li>
+
+          <li class="nav__item">
+            <a class:list={["nav__link nav__link--one", { "is-current": isActive("one") }]} href={r("integradeOne")}>
+              Integrade<span class="nav__one">One</span>
+            </a>
+          </li>
+          <li class="nav__item"><a class:list={["nav__link", { "is-current": isActive("clients") }]} href={r("clients")}>{c.ui.nav.clients}</a></li>
+          <li class="nav__item"><a class:list={["nav__link", { "is-current": isActive("about") }]} href={r("about")}>{c.ui.nav.about}</a></li>
+          <li class="nav__item"><a class:list={["nav__link", { "is-current": isActive("contact") }]} href={r("contact")}>{c.ui.nav.contact}</a></li>
+        </ul>
+
+        <div class="nav__mobile-extra">
+          <a class="btn btn--gold" href={r("contact")}>{c.ui.cta}<span aria-hidden="true">→</span></a>
+          <a href={contact.phoneHref}>{contact.phoneDisplay}</a>
+          <a href={contact.whatsappHref} target="_blank" rel="noopener">{c.ui.whatsapp}</a>
+        </div>
+      </nav>
+
+      <a class="btn btn--navy hdr__cta" href={r("contact")}>{c.ui.cta}<span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+  <div class="hdr__scrim" data-scrim hidden></div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .hdr__utility {
+    background: var(--navy-950);
+    color: #a9bfd0;
+    font-size: 12.5px;
+  }
+
+  .hdr__utility-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 36px;
+    gap: 16px;
+  }
+
+  .hdr__claim {
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hdr__utility-links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-shrink: 0;
+  }
+
+  .hdr__utility-links a:hover {
+    color: var(--white);
+  }
+
+  .hdr__langs {
+    display: flex;
+    gap: 2px;
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    padding-left: 16px;
+  }
+
+  .hdr__langs a {
+    padding: 3px 7px;
+    border-radius: 2px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .hdr__langs a[aria-current="true"] {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--white);
+  }
+
+  .hdr__main {
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .hdr__main-inner {
+    display: flex;
+    align-items: center;
+    height: var(--header-h);
+    gap: 32px;
+  }
+
+  .hdr__logo img {
+    height: 34px;
+    width: auto;
+  }
+
+  .nav {
+    flex: 1;
+    height: 100%;
+  }
+
+  .nav__list {
+    list-style: none;
+    display: flex;
+    height: 100%;
+    gap: 4px;
+  }
+
+  .nav__item {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .nav__trigger,
+  .nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 550;
+    color: var(--ink);
+  }
+
+  .nav__trigger::after,
+  .nav__link::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: -1px;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
+  }
+
+  .nav__trigger:hover::after,
+  .nav__link:hover::after,
+  .nav__trigger[aria-expanded="true"]::after,
+  .is-current::after {
+    transform: scaleX(1);
+  }
+
+  .nav__chev {
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .nav__trigger[aria-expanded="true"] .nav__chev {
+    transform: translateY(1px) rotate(-135deg);
+  }
+
+  .nav__link--one {
+    gap: 5px;
+  }
+
+  .nav__one {
+    font-weight: 700;
+    color: var(--teal-600);
+  }
+
+  .hdr__cta {
+    min-height: 44px;
+    padding: 0 20px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .mega {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: var(--white);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 30px 60px rgba(8, 26, 46, 0.12);
+  }
+
+  .mega__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 64px;
+    padding-top: 44px;
+    padding-bottom: 48px;
+  }
+
+  .mega__inner--wide {
+    grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+
+  .mega__kicker {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal-600);
+    margin-bottom: 14px;
+  }
+
+  .mega__title {
+    font-size: 30px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .mega__text {
+    color: var(--muted);
+    max-width: 42ch;
+    margin: 0;
+  }
+
+  .mega__overview {
+    display: inline-flex;
+    gap: 8px;
+    margin-top: 20px;
+    font-weight: 600;
+    color: var(--teal-600);
+    font-size: 14.5px;
+  }
+
+  .mega__group-title {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mega__links {
+    list-style: none;
+    display: grid;
+    align-content: start;
+  }
+
+  .mega__links a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .mega__links a span {
+    color: var(--teal);
+    transition: transform 0.18s ease;
+  }
+
+  .mega__links a:hover {
+    color: var(--teal-600);
+  }
+
+  .mega__links a:hover span {
+    transform: translateX(4px);
+  }
+
+  .hdr__burger,
+  .nav__mobile-extra {
+    display: none;
+  }
+
+  .hdr__scrim {
+    position: fixed;
+    inset: 0;
+    top: 0;
+    background: rgba(8, 26, 46, 0.35);
+    z-index: -1;
+  }
+
+  @media (max-width: 1320px) {
+    .hdr__cta {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .hdr__claim {
+      display: none;
+    }
+    .hdr__utility-inner {
+      justify-content: flex-end;
+    }
+    .hdr__main-inner {
+      justify-content: space-between;
+    }
+    .hdr__burger {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      height: 44px;
+      padding: 0 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .hdr__burger-lines {
+      display: grid;
+      gap: 5px;
+      width: 18px;
+    }
+    .hdr__burger-lines i {
+      height: 2px;
+      background: currentColor;
+      transition: transform 0.2s ease;
+    }
+    .hdr__burger[aria-expanded="true"] .hdr__burger-lines i:first-child {
+      transform: translateY(3.5px) rotate(45deg);
+    }
+    .hdr__burger[aria-expanded="true"] .hdr__burger-lines i:last-child {
+      transform: translateY(-3.5px) rotate(-45deg);
+    }
+    .nav {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: auto;
+      max-height: calc(100vh - var(--header-h) - 36px);
+      overflow-y: auto;
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
+      padding: 8px var(--gutter) 28px;
+    }
+    .nav.is-open {
+      display: block;
+    }
+    .nav__list {
+      flex-direction: column;
+      height: auto;
+      gap: 0;
+    }
+    .nav__item {
+      flex-direction: column;
+      border-bottom: 1px solid var(--line);
+    }
+    .nav__trigger,
+    .nav__link {
+      justify-content: space-between;
+      padding: 18px 0;
+      font-size: 17px;
+      width: 100%;
+      text-align: left;
+    }
+    .nav__trigger::after,
+    .nav__link::after {
+      display: none;
+    }
+    .mega {
+      position: static;
+      border: 0;
+      box-shadow: none;
+    }
+    .mega__inner,
+    .mega__inner--wide {
+      grid-template-columns: 1fr;
+      gap: 18px;
+      padding: 0 0 20px;
+    }
+    .mega__kicker,
+    .mega__title {
+      display: none;
+    }
+    .mega__text {
+      font-size: 14.5px;
+    }
+    .mega__links a {
+      font-size: 15.5px;
+      padding: 12px 0;
+    }
+    .nav__mobile-extra {
+      display: grid;
+      gap: 14px;
+      padding-top: 24px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hdr__logo img {
+      height: 28px;
+    }
+    .hdr__utility-links {
+      gap: 14px;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  if (header) {
+    const triggers = Array.from(header.querySelectorAll<HTMLButtonElement>("[data-trigger]"));
+    const burger = header.querySelector<HTMLButtonElement>("[data-burger]");
+    const nav = header.querySelector<HTMLElement>("[data-nav]");
+    const scrim = header.querySelector<HTMLElement>("[data-scrim]");
+    const desktop = window.matchMedia("(min-width: 1025px)");
+    let hoverTimer: number | undefined;
+
+    const panelOf = (btn: HTMLButtonElement) => document.getElementById(btn.getAttribute("aria-controls") || "");
+
+    const closeAll = (except?: HTMLButtonElement) => {
+      triggers.forEach((t) => {
+        if (t === except) return;
+        t.setAttribute("aria-expanded", "false");
+        const p = panelOf(t);
+        if (p) p.hidden = true;
+      });
+      if (scrim && desktop.matches && !except) scrim.hidden = true;
+    };
+
+    const open = (btn: HTMLButtonElement) => {
+      closeAll(btn);
+      btn.setAttribute("aria-expanded", "true");
+      const p = panelOf(btn);
+      if (p) p.hidden = false;
+      if (scrim && desktop.matches) scrim.hidden = false;
+    };
+
+    triggers.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.getAttribute("aria-expanded") === "true") {
+          btn.setAttribute("aria-expanded", "false");
+          const p = panelOf(btn);
+          if (p) p.hidden = true;
+          if (scrim) scrim.hidden = true;
+        } else {
+          open(btn);
+        }
+      });
+
+      const item = btn.parentElement;
+      item?.addEventListener("mouseenter", () => {
+        if (!desktop.matches) return;
+        window.clearTimeout(hoverTimer);
+        hoverTimer = window.setTimeout(() => open(btn), 90);
+      });
+      item?.addEventListener("mouseleave", () => {
+        if (!desktop.matches) return;
+        window.clearTimeout(hoverTimer);
+        hoverTimer = window.setTimeout(() => closeAll(), 160);
+      });
+    });
+
+    scrim?.addEventListener("click", () => closeAll());
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const openBtn = triggers.find((t) => t.getAttribute("aria-expanded") === "true");
+      closeAll();
+      openBtn?.focus();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!header.contains(e.target as Node)) closeAll();
+    });
+
+    burger?.addEventListener("click", () => {
+      const expanded = burger.getAttribute("aria-expanded") === "true";
+      burger.setAttribute("aria-expanded", String(!expanded));
+      nav?.classList.toggle("is-open", !expanded);
+      if (expanded) closeAll();
+    });
+
+    desktop.addEventListener("change", () => {
+      closeAll();
+      burger?.setAttribute("aria-expanded", "false");
+      nav?.classList.remove("is-open");
+    });
+  }
+</script>

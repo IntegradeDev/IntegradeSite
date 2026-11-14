@@ -1,0 +1,137 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import LogoWall from "../components/LogoWall.astro";
+import SectorMosaic from "../components/SectorMosaic.astro";
+import BrazilMap from "../components/BrazilMap.astro";
+import Sectors from "../components/Sectors.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { totals } from "../data/clients";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const k = c.clients;
+const heroStats = [
+  [k.stats.organizations, `+${totals.organizations}`],
+  [k.stats.sectors, String(totals.sectors)],
+  [k.stats.ufs, String(totals.ufs)],
+  [k.stats.regions, `${totals.regions} ${k.stats.regionsValue}`],
+];
+---
+
+<BaseLayout locale={locale} alternates={alt("clients")} title={k.title} description={k.description} current="clients">
+  <PageHero
+    eyebrow={k.hero.eyebrow}
+    title={k.hero.title}
+    lead={k.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[{ label: "Integrade", href: routes.home[locale] }, { label: k.title }]}
+  >
+    <Fragment slot="actions">
+      <a class="link-arrow" href="#mapa">{k.hero.mapLink}<span aria-hidden="true">↓</span></a>
+    </Fragment>
+    <dl slot="aside" class="hero-stats">
+      {heroStats.map(([label, value]) => (
+        <div>
+          <dd>{value}</dd>
+          <dt>{label}</dt>
+        </div>
+      ))}
+    </dl>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="center-head">
+        <p class="eyebrow">{k.logos.eyebrow}</p>
+        <h2 class="h2">{k.logos.title}</h2>
+        <p class="lead">{k.logos.text}</p>
+      </div>
+      <LogoWall locale={locale} />
+      <div class="mt-l">
+        <SectorMosaic locale={locale} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper" id="mapa">
+    <div class="wrap">
+      <BrazilMap locale={locale} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="list-head">
+        <h2 class="h2">{k.list.title}</h2>
+        <p class="lead">{k.list.text}</p>
+      </div>
+      <Sectors locale={locale} />
+    </div>
+  </section>
+
+  <CtaBand locale={locale} />
+</BaseLayout>
+
+<style>
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 24px;
+    margin: 0;
+  }
+
+  .hero-stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    border-left: 2px solid var(--gold);
+    padding-left: 16px;
+  }
+
+  .hero-stats dd {
+    margin: 0;
+    font-size: clamp(32px, 3.4vw, 48px);
+    font-weight: 250;
+    letter-spacing: -0.04em;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .hero-stats dt {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-light);
+    margin-top: 8px;
+  }
+
+  .center-head {
+    max-width: 760px;
+    margin: 0 auto clamp(40px, 5vw, 64px);
+    text-align: center;
+  }
+
+  .center-head .eyebrow {
+    justify-content: center;
+  }
+
+  .center-head .lead {
+    margin: 20px auto 0;
+  }
+
+  .list-head {
+    max-width: 760px;
+    margin-bottom: clamp(40px, 5vw, 56px);
+  }
+
+  .list-head .lead {
+    margin-top: 18px;
+  }
+</style>

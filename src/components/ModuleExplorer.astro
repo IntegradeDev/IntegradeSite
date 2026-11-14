@@ -1,0 +1,228 @@
+---
+import { modulePath, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+  id?: string;
+}
+
+const { locale, id = "modules" } = Astro.props;
+const c = getCopy(locale);
+const L = c.modules.labels;
+const items = c.modules.items;
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<div class="mx" data-tabs data-tabs-orientation="grid">
+  <div class="mx__list" role="tablist" aria-label={L.explorerLabel}>
+    {items.map((mod, i) => (
+      <button
+        class="mx__tab"
+        type="button"
+        role="tab"
+        id={`${id}-tab-${i}`}
+        aria-controls={`${id}-panel-${i}`}
+        aria-selected={i === 0 ? "true" : "false"}
+        tabindex={i === 0 ? 0 : -1}
+      >
+        <span class="mx__tab-name">{mod.name}</span>
+        <small>{mod.descriptor}</small>
+      </button>
+    ))}
+  </div>
+
+  {items.map((mod, i) => (
+    <article class="mx__panel" role="tabpanel" id={`${id}-panel-${i}`} aria-labelledby={`${id}-tab-${i}`} tabindex="0" hidden={i !== 0}>
+      <div class="mx__panel-top">
+        <span class="mx__index">{pad(i + 1)} / {pad(items.length)}</span>
+        <span class="mx__badge">{L.module}</span>
+      </div>
+      <p class="mx__name"><span>One</span>{mod.name.replace("One ", "")}</p>
+      <h3 class="mx__headline">{mod.headline}</h3>
+      <dl class="mx__facts">
+        <div><dt>{L.need}</dt><dd>{mod.need}</dd></div>
+        <div><dt>{L.benefit}</dt><dd>{mod.benefit}</dd></div>
+        {mod.origin && <div><dt>{L.origin}</dt><dd>{mod.origin}</dd></div>}
+      </dl>
+      <a class="link-arrow" href={modulePath(locale, mod.slug)}>{c.ui.learnMore}: {mod.name}<span aria-hidden="true">→</span></a>
+    </article>
+  ))}
+</div>
+
+<style>
+  .mx {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    border: 1px solid var(--line);
+    background: var(--white);
+  }
+
+  .mx__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--pale);
+    border-right: 1px solid var(--line);
+  }
+
+  .mx__tab {
+    position: relative;
+    text-align: left;
+    padding: 22px 24px;
+    min-height: 96px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    cursor: pointer;
+    color: var(--ink);
+    transition: background 0.15s ease;
+  }
+
+  .mx__tab:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+
+  .mx__tab:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .mx__tab:hover {
+    background: #e2edf1;
+  }
+
+  .mx__tab-name {
+    display: block;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .mx__tab small {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .mx__tab[aria-selected="true"] {
+    background: var(--navy);
+    color: var(--white);
+    box-shadow: inset 4px 0 0 var(--gold);
+  }
+
+  .mx__tab[aria-selected="true"] small {
+    color: #b9cddb;
+  }
+
+  .mx__panel {
+    padding: clamp(28px, 3.6vw, 52px);
+    display: flex;
+    flex-direction: column;
+    min-height: 480px;
+  }
+
+  .mx__panel:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .mx__panel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+    padding-bottom: 36px;
+  }
+
+  .mx__index {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mx__badge {
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-600);
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+
+  .mx__name {
+    font-size: 15px;
+    font-weight: 650;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+
+  .mx__name span {
+    color: var(--teal-600);
+    margin-right: 5px;
+  }
+
+  .mx__headline {
+    font-size: clamp(26px, 2.6vw, 36px);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    margin-bottom: 28px;
+    max-width: 20ch;
+  }
+
+  .mx__facts {
+    margin: 0 0 28px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .mx__facts dt {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .mx__facts dd {
+    margin: 0;
+    font-size: 15.5px;
+    color: var(--text);
+    max-width: 52ch;
+  }
+
+  .mx .link-arrow {
+    align-self: flex-start;
+  }
+
+  @media (max-width: 900px) {
+    .mx {
+      grid-template-columns: 1fr;
+    }
+    .mx__list {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .mx__panel {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .mx__tab {
+      padding: 16px;
+      min-height: 84px;
+    }
+    .mx__tab-name {
+      font-size: 15px;
+    }
+  }
+</style>
+
+<script>
+  import { initTabs } from "../scripts/tabs";
+  initTabs();
+</script>

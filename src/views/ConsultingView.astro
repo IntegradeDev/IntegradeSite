@@ -1,0 +1,165 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, type Locale, type RouteId } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { contact, norms } from "../data/company";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const k = c.consulting;
+const r = (id: string) => routes[id as RouteId][locale];
+---
+
+<BaseLayout locale={locale} alternates={alt("consulting")} title={k.title} description={k.description} current="consulting">
+  <PageHero
+    photo="consulting"
+    locale={locale}
+    eyebrow={k.hero.eyebrow}
+    title={k.hero.title}
+    lead={k.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[{ label: "Integrade", href: routes.home[locale] }, { label: "Consulting" }]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href={`${routes.contact[locale]}?need=consultoria`}>{k.hero.primary}<span aria-hidden="true">→</span></a>
+      <a class="link-arrow" href={contact.consultingUrl} target="_blank" rel="noopener">{k.hero.secondary}<span aria-hidden="true">↗</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={k.specialties.eyebrow} title={k.specialties.title} stacked />
+      <div class="spec">
+        {k.specialties.items.map((s, i) => (
+          <article class="spec__item">
+            <p class="card__kicker">{String(i + 1).padStart(2, "0")} · {s.kicker}</p>
+            <h3 class="spec__title">{s.title}</h3>
+            <p class="spec__text">{s.text}</p>
+            <ul class="ticks">
+              {s.bullets.map((b) => <li>{b}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark section--tight">
+    <div class="wrap norms">
+      <div>
+        <p class="eyebrow">{c.home.compliance.eyebrow}</p>
+        <h2 class="h2 norms__title">{c.home.compliance.title}</h2>
+      </div>
+      <div>
+        <p class="lead" style="margin-bottom:28px">{c.home.compliance.lead}</p>
+        <ul class="chips">
+          {norms.map((n) => <li class="chip"><strong>{n.code}</strong>{n.label[locale]}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--pale">
+    <div class="wrap">
+      <SectionHead eyebrow={k.connection.eyebrow} title={k.connection.title} stacked />
+      <div class="grid grid--2">
+        {k.connection.items.map((it) => (
+          <a class="card card--top" href={r(it.route)}>
+            <h3>{it.title}</h3>
+            <p>{it.text}</p>
+            <span class="link-arrow">{c.ui.learnMore}<span aria-hidden="true">→</span></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap site-cta">
+      <div>
+        <h2 class="h2 site-cta__title">{k.site.title}</h2>
+        <p class="lead">{k.site.text}</p>
+      </div>
+      <a class="btn btn--outline" href={contact.consultingUrl} target="_blank" rel="noopener">{k.site.cta}<span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="consultoria" />
+</BaseLayout>
+
+<style>
+  .spec {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .spec__item {
+    background: var(--white);
+    padding: clamp(28px, 3.6vw, 56px);
+  }
+
+  .spec__title {
+    font-size: clamp(26px, 2.6vw, 38px);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin-bottom: 18px;
+    max-width: 18ch;
+  }
+
+  .spec__text {
+    color: var(--muted);
+    margin-bottom: 28px;
+    max-width: 52ch;
+  }
+
+  @media (max-width: 860px) {
+    .spec {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .norms {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .norms__title {
+    font-size: clamp(28px, 3vw, 42px);
+  }
+
+  @media (max-width: 860px) {
+    .norms {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .site-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    padding-top: 48px;
+  }
+
+  .site-cta__title {
+    font-size: clamp(26px, 2.6vw, 36px);
+    margin-bottom: 14px;
+  }
+
+  .site-cta .lead {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,210 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { alt, routes, type Locale, type RouteId } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const c = getCopy(locale);
+const s = c.solutions;
+const r = (id: string) => routes[id as RouteId][locale];
+const pkgNeeds = ["identificacao", "inventario", "outsourcing"];
+---
+
+<BaseLayout locale={locale} alternates={alt("solutions")} title={s.title} description={s.description} current="solutions">
+  <PageHero
+    photo="tech"
+    locale={locale}
+    eyebrow={s.hero.eyebrow}
+    title={s.hero.title}
+    lead={s.hero.lead}
+    crumbLabel={c.ui.breadcrumb}
+    crumbs={[{ label: "Integrade", href: routes.home[locale] }, { label: "Solutions" }]}
+  >
+    <Fragment slot="actions">
+      <a class="btn btn--gold" href={r("integradeOne")}>{s.hero.primary}<span aria-hidden="true">→</span></a>
+      <a class="link-arrow" href={`${routes.contact[locale]}?need=software`}>{s.hero.secondary}<span aria-hidden="true">→</span></a>
+    </Fragment>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap">
+      <SectionHead eyebrow={s.lines.eyebrow} title={s.lines.title} stacked />
+      <div class="lines">
+        {s.lines.items.map((l, i) => (
+          <a class:list={["line", { "line--one": i === 0 }]} href={r(l.route)}>
+            <p class="card__kicker">{String(i + 1).padStart(2, "0")} · {l.kicker}</p>
+            <h3 class="line__title">{l.title}</h3>
+            <p class="line__text">{l.text}</p>
+            <ul class="ticks">
+              {l.bullets.map((b) => <li>{b}</li>)}
+            </ul>
+            <span class="link-arrow">{l.link}<span aria-hidden="true">→</span></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--pale">
+    <div class="wrap">
+      <SectionHead eyebrow={s.packages.eyebrow} title={s.packages.title} lead={s.packages.lead} />
+      <div class="pkgs">
+        {s.packages.items.map((p, i) => (
+          <article class:list={["pkg", { "pkg--featured": !!p.featured }]}>
+            {p.featured && <span class="pkg__badge">{p.featured}</span>}
+            <h3 class="pkg__name">{p.name}</h3>
+            <p class="pkg__text">{p.text}</p>
+            <ul class="ticks">
+              {p.bullets.map((b) => <li>{b}</li>)}
+            </ul>
+            <a class:list={["btn", p.featured ? "btn--gold" : "btn--outline"]} href={`${routes.contact[locale]}?need=${pkgNeeds[i]}`}>
+              {s.packages.cta}<span aria-hidden="true">→</span>
+            </a>
+          </article>
+        ))}
+      </div>
+      <p class="note mt-l">{s.commercial}</p>
+    </div>
+  </section>
+
+  <CtaBand locale={locale} need="software" />
+</BaseLayout>
+
+<style>
+  .lines {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    gap: 24px;
+  }
+
+  .line {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 3vw, 44px);
+    border: 1px solid var(--line);
+    background: var(--white);
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .line:hover {
+    border-color: var(--navy);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(16, 45, 78, 0.1);
+  }
+
+  .line__title {
+    font-size: clamp(28px, 2.6vw, 38px);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+
+  .line__text {
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+
+  .line .link-arrow {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  .line--one {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #cfdde8;
+  }
+
+  .line--one .line__title {
+    color: var(--white);
+  }
+
+  .line--one .line__text {
+    color: #b9cddb;
+  }
+
+  .line--one .card__kicker {
+    color: var(--gold);
+  }
+
+  .line--one .ticks li {
+    color: #d5e2ec;
+  }
+
+  .line--one .ticks li::before {
+    background: var(--gold);
+  }
+
+  .line--one .link-arrow {
+    color: var(--white);
+  }
+
+  @media (max-width: 960px) {
+    .lines {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .pkgs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .pkg {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--line);
+    padding: clamp(28px, 3vw, 40px);
+  }
+
+  .pkg__name {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .pkg__text {
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .pkg .btn {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  .pkg--featured {
+    border: 2px solid var(--navy);
+  }
+
+  .pkg__badge {
+    position: absolute;
+    top: -13px;
+    left: clamp(28px, 3vw, 40px);
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+  }
+
+  @media (max-width: 960px) {
+    .pkgs {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

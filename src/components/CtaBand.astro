@@ -1,0 +1,115 @@
+---
+import { routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+import { contact } from "../data/company";
+
+interface Props {
+  locale: Locale;
+  need?: string;
+}
+
+const { locale, need } = Astro.props;
+const c = getCopy(locale);
+const b = c.ui.cta_band;
+const href = need ? `${routes.contact[locale]}?need=${encodeURIComponent(need)}` : routes.contact[locale];
+---
+
+<section class="cta section--darker">
+  <div class="wrap cta__grid">
+    <div>
+      <p class="eyebrow">{b.eyebrow}</p>
+      <h2 class="h2">{b.title}</h2>
+      <p class="lead">{b.text}</p>
+      <div class="actions">
+        <a class="btn btn--gold" href={href}>{b.primary}<span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+    <dl class="cta__channels">
+      <div>
+        <dt>{b.phone}</dt>
+        <dd><a href={contact.phoneHref}>{contact.phoneDisplay}</a></dd>
+      </div>
+      <div>
+        <dt>{b.whatsapp}</dt>
+        <dd><a href={contact.whatsappHref} target="_blank" rel="noopener">{contact.phoneDisplay} ↗</a></dd>
+      </div>
+      <div>
+        <dt>{b.email}</dt>
+        <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    padding: var(--section) 0;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .cta::after {
+    content: "";
+    position: absolute;
+    right: -180px;
+    top: 50%;
+    width: 620px;
+    height: 620px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 0 90px rgba(255, 255, 255, 0.02), 0 0 0 180px rgba(255, 255, 255, 0.015);
+    z-index: -1;
+  }
+
+  .cta__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(40px, 6vw, 96px);
+    align-items: end;
+  }
+
+  .cta .lead {
+    margin-top: 24px;
+  }
+
+  .cta__channels {
+    margin: 0;
+    display: grid;
+    border-top: 1px solid var(--line-dark);
+  }
+
+  .cta__channels > div {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .cta__channels dt {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-light);
+    margin-bottom: 6px;
+  }
+
+  .cta__channels dd {
+    margin: 0;
+    font-size: clamp(19px, 1.7vw, 24px);
+    font-weight: 300;
+    color: var(--white);
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+
+  .cta__channels a:hover {
+    color: var(--gold);
+  }
+
+  @media (max-width: 860px) {
+    .cta__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
