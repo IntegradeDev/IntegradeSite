@@ -5,6 +5,7 @@ import SectionHead from "../components/SectionHead.astro";
 import ProofBand from "../components/ProofBand.astro";
 import LogoWall from "../components/LogoWall.astro";
 import Photo from "../components/Photo.astro";
+import BrandArchitecture from "../components/BrandArchitecture.astro";
 import CtaBand from "../components/CtaBand.astro";
 import { alt, routes, type Locale } from "../i18n/locales";
 import { getCopy } from "../copy";
@@ -17,7 +18,6 @@ interface Props {
 const { locale } = Astro.props;
 const c = getCopy(locale);
 const a = c.about;
-const archRoutes = [routes.consulting[locale], routes.services[locale], routes.solutions[locale]];
 ---
 
 <BaseLayout locale={locale} alternates={alt("about")} title={a.title} description={a.description} current="about">
@@ -64,32 +64,7 @@ const archRoutes = [routes.consulting[locale], routes.services[locale], routes.s
   <section class="section section--pale">
     <div class="wrap">
       <SectionHead eyebrow={a.architecture.eyebrow} title={a.architecture.title} stacked />
-      <div class="arch" role="group" aria-label={a.architecture.eyebrow}>
-        <div class="arch__corp">
-          <img src="/img/integrade-logo.png" alt="Integrade" width="200" height="45" loading="lazy" />
-          <p class="arch__corp-label">{a.architecture.corporate}</p>
-          <p class="arch__corp-line">{a.architecture.corporateLine}</p>
-        </div>
-        <div class="arch__connector" aria-hidden="true"></div>
-        <ul class="arch__divs">
-          {a.architecture.divisions.map((d, i) => (
-            <li>
-              <a href={archRoutes[i]}>
-                <span class="arch__brand">Integrade</span>
-                <span class="arch__name">{d.name}</span>
-                <span class="arch__text">{d.text}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-        <div class="arch__connector arch__connector--right" aria-hidden="true"></div>
-        <div class="arch__products">
-          <p class="arch__products-title">{a.architecture.productsTitle}</p>
-          <ul>
-            {a.architecture.products.map((p) => <li>{p}</li>)}
-          </ul>
-        </div>
-      </div>
+      <BrandArchitecture locale={locale} />
     </div>
   </section>
 
@@ -201,168 +176,6 @@ const archRoutes = [routes.consulting[locale], routes.services[locale], routes.s
   @media (max-width: 860px) {
     .story {
       grid-template-columns: 1fr;
-    }
-  }
-
-  .arch {
-    display: grid;
-    justify-items: center;
-  }
-
-  .arch__corp {
-    text-align: center;
-    background: var(--white);
-    border: 1px solid var(--line);
-    padding: 36px 56px;
-    min-width: min(100%, 460px);
-  }
-
-  .arch__corp img {
-    height: 42px;
-    width: auto;
-    margin: 0 auto 16px;
-  }
-
-  .arch__corp-label {
-    font-size: 15px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .arch__corp-line {
-    font-size: 13.5px;
-    letter-spacing: 0.04em;
-    color: var(--teal-600);
-    margin: 0;
-  }
-
-  .arch__connector {
-    width: 1px;
-    height: 48px;
-    background: var(--navy);
-  }
-
-  .arch__divs {
-    list-style: none;
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 24px;
-    width: 100%;
-    padding-top: 32px;
-  }
-
-  .arch__divs::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: calc(100% / 6);
-    right: calc(100% / 6);
-    height: 1px;
-    background: var(--navy);
-  }
-
-  .arch__divs li {
-    position: relative;
-  }
-
-  .arch__divs li::before {
-    content: "";
-    position: absolute;
-    top: -32px;
-    left: 50%;
-    width: 1px;
-    height: 32px;
-    background: var(--navy);
-  }
-
-  .arch__divs a {
-    display: grid;
-    gap: 6px;
-    text-align: center;
-    padding: 32px 24px;
-    background: var(--white);
-    border: 1px solid var(--line);
-    border-top: 3px solid var(--teal);
-    height: 100%;
-    transition: border-color 0.2s ease, transform 0.2s ease;
-  }
-
-  .arch__divs a:hover {
-    transform: translateY(-3px);
-    border-color: var(--navy);
-    border-top-color: var(--gold);
-  }
-
-  .arch__brand {
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .arch__name {
-    font-size: 30px;
-    font-weight: 300;
-    letter-spacing: -0.03em;
-    color: var(--ink);
-  }
-
-  .arch__text {
-    font-size: 14.5px;
-    color: var(--muted);
-  }
-
-  .arch__connector--right {
-    justify-self: end;
-    margin-right: calc(100% / 6);
-  }
-
-  .arch__products {
-    justify-self: end;
-    width: min(100%, calc(100% / 3 + 120px));
-    background: var(--navy);
-    color: #cfdde8;
-    padding: 28px 32px;
-  }
-
-  .arch__products-title {
-    font-size: 11.5px;
-    font-weight: 650;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 14px;
-  }
-
-  .arch__products ul {
-    list-style: none;
-    display: grid;
-    gap: 8px;
-  }
-
-  .arch__products li {
-    color: var(--white);
-    font-size: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--line-dark);
-  }
-
-  @media (max-width: 860px) {
-    .arch__divs {
-      grid-template-columns: 1fr;
-      padding-top: 0;
-      gap: 16px;
-    }
-    .arch__divs::before,
-    .arch__divs li::before {
-      display: none;
-    }
-    .arch__connector--right {
-      justify-self: center;
-      margin-right: 0;
-    }
-    .arch__products {
-      justify-self: stretch;
-      width: 100%;
     }
   }
 

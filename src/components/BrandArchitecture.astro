@@ -1,0 +1,291 @@
+---
+import { routes, type Locale } from "../i18n/locales";
+import { getCopy } from "../copy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const a = getCopy(locale).about.architecture;
+const divisionRoutes = [routes.consulting[locale], routes.services[locale], routes.solutions[locale]];
+const productRoutes = [routes.integradeOne[locale], routes.apps[locale], routes.identification[locale], routes.equipment[locale]];
+---
+
+<div class="ba" role="group" aria-label={a.eyebrow}>
+  <div class="ba__corp">
+    <img src="/img/integrade-logo.png" alt="Integrade" width="184" height="41" loading="lazy" />
+    <p class="ba__corp-label">{a.corporate}</p>
+    <p class="ba__corp-line">{a.corporateLine.split("·").map((w) => w.trim()).join(" • ")}</p>
+  </div>
+
+  <div class="ba__stem" aria-hidden="true"></div>
+
+  <ul class="ba__divs">
+    {a.divisions.map((d, i) => (
+      <li>
+        <a class="ba__card" href={divisionRoutes[i]}>
+          <span class="ba__icon" aria-hidden="true">
+            {i === 0 && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="7" width="18" height="13" rx="2.5" />
+                <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" />
+                <path d="M3 12.5h18" />
+                <path d="M11 12.5h2v1.5h-2z" />
+              </svg>
+            )}
+            {i === 1 && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="4.5" width="14" height="16.5" rx="2.5" />
+                <path d="M9 4.5V3.5h6v1" />
+                <path d="M9 4.5h6v2H9z" />
+                <path d="m9 13.5 2 2 4-4.5" />
+              </svg>
+            )}
+            {i === 2 && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3.5" y="13" width="7.5" height="7.5" rx="1.4" />
+                <rect x="3.5" y="4" width="7.5" height="7.5" rx="1.4" />
+                <rect x="13" y="13" width="7.5" height="7.5" rx="1.4" />
+                <rect x="14.5" y="2.5" width="6" height="6" rx="1.2" />
+              </svg>
+            )}
+          </span>
+          <span class="ba__name">{d.name}</span>
+          <span class="ba__text">{d.text}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <div class="ba__stem" aria-hidden="true"></div>
+
+  <div class="ba__family">
+    <div class="ba__family-brand">
+      <img src="/img/integrade-one.svg" alt="Integrade One" width="370" height="72" loading="lazy" />
+      <p>{a.productsTitle}</p>
+    </div>
+    <ul class="ba__products">
+      {a.products.map((p, i) => (
+        <li><a href={productRoutes[i]}>{p}</a></li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .ba {
+    --ba-line: #cfd9df;
+    --ba-gap: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fbfcfd;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: clamp(32px, 4.5vw, 56px) clamp(16px, 2vw, 24px);
+  }
+
+  .ba__corp {
+    text-align: center;
+    padding: 0 16px;
+  }
+
+  .ba__corp img {
+    height: 40px;
+    width: auto;
+    margin: 0 auto 14px;
+  }
+
+  .ba__corp-label {
+    font-size: 17px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .ba__corp-line {
+    font-size: 15px;
+    color: #4f6072;
+    margin: 0;
+  }
+
+  .ba__stem {
+    width: 2px;
+    height: 32px;
+    background: var(--ba-line);
+    margin-top: 28px;
+  }
+
+  .ba__stem + .ba__family {
+    margin-top: 0;
+  }
+
+  .ba__divs + .ba__stem {
+    margin-top: 0;
+  }
+
+  .ba__divs {
+    list-style: none;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ba-gap);
+    width: 100%;
+    padding-top: 28px;
+  }
+
+  /* Horizontal bar spans exactly from the first card's center to the last card's center. */
+  .ba__divs::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: calc((100% - 2 * var(--ba-gap)) / 6);
+    right: calc((100% - 2 * var(--ba-gap)) / 6);
+    height: 2px;
+    background: var(--ba-line);
+  }
+
+  .ba__divs li {
+    position: relative;
+  }
+
+  .ba__divs li::before {
+    content: "";
+    position: absolute;
+    top: -28px;
+    left: calc(50% - 1px);
+    width: 2px;
+    height: 28px;
+    background: var(--ba-line);
+  }
+
+  .ba__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding: 28px 20px 26px;
+    text-align: center;
+    background: var(--white);
+    border: 1px solid #dfe6ea;
+    border-radius: 16px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .ba__card:hover {
+    border-color: var(--teal);
+    box-shadow: 0 14px 32px rgba(16, 45, 78, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .ba__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    color: var(--navy);
+    transition: color 0.2s ease;
+  }
+
+  .ba__card:hover .ba__icon {
+    color: var(--teal-600);
+  }
+
+  .ba__icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .ba__name {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .ba__text {
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .ba__family {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px 40px;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 24px 28px;
+    background: var(--white);
+    border: 1px solid #dfe6ea;
+    border-radius: 16px;
+  }
+
+  .ba__family-brand img {
+    width: 220px;
+    height: auto;
+    margin-bottom: 6px;
+  }
+
+  .ba__family-brand p {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .ba__products {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .ba__products a {
+    display: inline-block;
+    padding: 9px 16px;
+    border: 1px solid #dfe6ea;
+    border-radius: 999px;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--ink);
+    background: #fbfcfd;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .ba__products a:hover {
+    border-color: var(--teal);
+    color: var(--teal-600);
+  }
+
+  @media (max-width: 760px) {
+    .ba__divs {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding-top: 0;
+    }
+    .ba__divs::before {
+      display: none;
+    }
+    .ba__divs li::before {
+      top: -28px;
+    }
+    .ba__divs li:first-child::before {
+      display: none;
+    }
+    .ba__divs + .ba__stem {
+      margin-top: 0;
+    }
+    .ba__stem:first-of-type {
+      margin-top: 24px;
+    }
+    .ba__family {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
